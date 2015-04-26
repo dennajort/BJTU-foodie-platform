@@ -1,22 +1,21 @@
 var Joi = require("joi"),
-    Boom = require("boom"),
-    P = require("bluebird"),
-    _ = require("lodash"),
-    jwt = require("jsonwebtoken"),
-    jwtVerifyAsync = P.promisify(jwt.verify)
+  Boom = require("boom"),
+  P = require("bluebird"),
+  _ = require("lodash"),
+  jwt = require("jsonwebtoken"),
+  jwtVerifyAsync = P.promisify(jwt.verify, jwt)
 
 var APP_SECRET = "secret",
-    EXP_TIME = 60 * 60 * 24 * 2,
-    EXP_TIME_REFRESH = 60 * 60 * 24 * 15
+  EXP_TIME = 60 * 60 * 24 * 2,
+  EXP_TIME_REFRESH = 60 * 60 * 24 * 15
 
 exports.register = function (server, options, next) {
-  var db = server.plugins.db,
-      User = db.models.User
+  var Users = server.plugins.dogwater.users
 
   var validateFunc = function(token, callback) {
     jwtVerifyAsync(token, APP_SECRET).then(function(data) {
-      return User.find(data.id).then(function(user) {
-        if (user === null) return callback(null, false)
+      return Users.findOne(data.userId).then(function(user) {
+        if (user === undefined) return callback(null, false)
         callback(undefined, true, {
           user: user,
           scope: data.scope || []
@@ -89,9 +88,9 @@ exports.register = function (server, options, next) {
         })(req.payload.scope)
 
         if (req.payload.grant_type == "password") {
-          User.find({where: {email: req.payload.username}}).then(function(user) {
-            if (user === null) return doError("invalid_grant")
-            return user.checkPassword(req.payload.password).then(function(ok) {
+          Users.findOne({email: req.payload.username}).then(function(user) {
+            if (user === undefined) return doError("invalid_grant")
+            return Users.checkPassword(user, req.payload.password).then(function(ok) {
               if (ok) return generateTokens(user.id, scope)
               doError("invalid_grant")
             })

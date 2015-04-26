@@ -9,5 +9,5 @@ exports.register = function(server, options, next) {
 
 exports.register.attributes = {
   name: "api",
-  dependencies: ["db", "oauth", "rest"]
+  dependencies: ["dogwater", "oauth", "bedwetter"]
 }

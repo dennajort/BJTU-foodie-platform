@@ -1,43 +1,40 @@
 var P = require("bluebird"),
-    Hapi = require("hapi"),
-    requireIndex = require("requireindex"),
-    path = require("path"),
-    _ = require("lodash")
-
-function loadSwagger(server) {
-  return new P(function(resolve, reject) {
-    server.register(require("./swagger"), function(err) {
-      if (err) return reject(err)
-      resolve(server)
-    })
-  })
-}
-
-function loadApi(server) {
-  return new P(function(resolve, reject) {
-    server.register(
-      require("../api"),
-      {routes: {prefix: "/api"}},
-      function(err) {
-        if (err) return reject(err)
-        if (process.env.NODE_ENV == "test") return resolve(server)
-        resolve(loadSwagger(server))
-      }
-    )
-  })
-}
+  Hapi = require("hapi"),
+  Boom = require("boom")
 
 module.exports = function loadServer() {
-  return new P(function(resolve, reject) {
-    var server = new Hapi.Server({
-      connections: {routes: {cors: {origin: ["*"]}}}
-    }), plugins = []
+  var server = new Hapi.Server({
+    connections: {routes: {cors: {origin: ["*"]}}}
+  })
 
-    server.connection({
-      port: process.env.ELOVIZ_HTTP_PORT || 3000
-    })
+  server.connection({
+    port: process.env.ELOVIZ_HTTP_PORT || 3000
+  })
 
-    plugins.push({
+  function PLoad(plugins, options) {
+    return function() {
+      var opts = options || {}
+      return new P(function(resolve, reject) {
+        server.register(plugins, opts, function(err) {
+          if (err) return reject(err)
+          resolve(server)
+        })
+      })
+    }
+  }
+
+  server.ext("onPostHandler", function(req, rep) {
+    if (req.response instanceof Error && req.response.code == "E_VALIDATION") {
+      var b = Boom.badRequest("Database validation error")
+      b.output.payload.validation = {"keys": req.response.invalidAttributes}
+      return rep(b)
+    }
+
+    rep.continue()
+  })
+
+  var p = PLoad([
+    {
       register: require("good"),
       options: {
         reporters: [{
@@ -45,14 +42,15 @@ module.exports = function loadServer() {
           events: {log: "*", response: "*", request: "*", error: "*"}
         }]
       }
-    })
-
-    plugins.push({
+    },
+    {
       register: require("dogwater"),
       options: {
         connections: {
-          "local": {
-            adapter: "sails-disk"
+          "db": {
+            adapter: "sails-disk",
+            filePath: "run/",
+            fileName: "eloviz.db"
           }
         },
         adapters: {
@@ -60,18 +58,24 @@ module.exports = function loadServer() {
         },
         models: require("../models")
       }
-    })
+    },
+    {
+      register: require("bedwetter"),
+      options: {
+        prefix: "/api",
+        userIdProperty: "user.id"
+      }
+    },
+    require("./handlers"),
+    require("./oauth")
+  ])()
+  .then(PLoad(
+    require("../api"),
+    {routes: {prefix: "/api"}}
+  ))
 
-    plugins.push(require("./handlers"))
-//    plugins.push(require("./db"))
-    plugins.push(require("./auth"))
-    plugins.push(require("./rest"))
+  if (process.env.NODE_ENV == "development") p = p.then(PLoad(require("blipp")))
+  if (process.env.NODE_ENV != "test") p = p.then(PLoad(require("./swagger")))
 
-    if(process.env.NODE_ENV == "development") plugins.push(require("blipp"))
-
-    server.register(plugins, function(err) {
-      if (err) return reject(err)
-      resolve(loadApi(server))
-    })
-  })
+  return p
 }
