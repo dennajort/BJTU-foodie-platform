@@ -1,10 +1,13 @@
 var _ = require("lodash")
 
-exports.register = function(server, options, next) {
-  _.forIn(require("requireindex")(__dirname), function(part) {
-    part(server)
+exports.register = function(server, options, done) {
+  server.dependency(["dogwater"], function(server, next) {
+    _.forIn(require("requireindex")(__dirname), function(part) {
+      part(server)
+    })
+    next()
   })
-  next()
+  done()
 }
 
 exports.register.attributes = {

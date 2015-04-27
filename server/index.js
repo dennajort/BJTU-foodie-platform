@@ -11,17 +11,7 @@ module.exports = function loadServer() {
     port: process.env.ELOVIZ_HTTP_PORT || 3000
   })
 
-  function PLoad(plugins, options) {
-    return function() {
-      var opts = options || {}
-      return new P(function(resolve, reject) {
-        server.register(plugins, opts, function(err) {
-          if (err) return reject(err)
-          resolve(server)
-        })
-      })
-    }
-  }
+  var register = P.promisify(server.register, server)
 
   server.ext("onPostHandler", function(req, rep) {
     if (req.response instanceof Error && req.response.code == "E_VALIDATION") {
@@ -33,49 +23,50 @@ module.exports = function loadServer() {
     rep.continue()
   })
 
-  var p = PLoad([
-    {
-      register: require("good"),
-      options: {
-        reporters: [{
-          reporter: require("good-console"),
-          events: {log: "*", response: "*", request: "*", error: "*"}
-        }]
-      }
-    },
-    {
-      register: require("dogwater"),
-      options: {
-        connections: {
-          "db": {
-            adapter: "sails-disk",
-            filePath: "run/",
-            fileName: "eloviz.db"
-          }
-        },
-        adapters: {
-          "sails-disk": require("sails-disk")
-        },
-        models: require("../models")
-      }
-    },
-    {
-      register: require("bedwetter"),
-      options: {
-        prefix: "/api",
-        userIdProperty: "user.id"
-      }
-    },
-    require("./handlers"),
-    require("./oauth")
-  ])()
-  .then(PLoad(
-    require("../api"),
-    {routes: {prefix: "/api"}}
-  ))
+  var plugins = [
+    register([
+      {
+        register: require("good"),
+        options: {
+          reporters: [{
+            reporter: require("good-console"),
+            events: {log: "*", response: "*", request: "*", error: "*"}
+          }]
+        }
+      },
+      {
+        register: require("dogwater"),
+        options: {
+          connections: {
+            "db": {
+              adapter: "sails-disk",
+              filePath: "run/",
+              fileName: "eloviz.db"
+            }
+          },
+          adapters: {
+            "sails-disk": require("sails-disk")
+          },
+          models: require("../models")
+        }
+      },
+      {
+        register: require("bedwetter"),
+        options: {
+          prefix: "/api",
+          userIdProperty: "user.id"
+        }
+      },
+      require("./handlers"),
+      require("./oauth")
+    ]),
+    register(require("../api"), {routes: {prefix: "/api"}})
+  ]
 
-  if (process.env.NODE_ENV == "development") p = p.then(PLoad(require("blipp")))
-  if (process.env.NODE_ENV != "test") p = p.then(PLoad(require("./swagger")))
+  if (process.env.NODE_ENV == "development") plugins.push(register(require("blipp")))
+  if (process.env.NODE_ENV != "test") plugins.push(register(require("./swagger")))
 
-  return p
+  return P.all(plugins).then(function() {
+    return server
+  })
 }

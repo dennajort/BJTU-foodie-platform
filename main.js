@@ -20,8 +20,8 @@ if (require.main === module) {
 
     process.once("SIGTERM", onSignals)
     process.once("SIGINT", onSignals)
-  }).catch(function(err) {
-    console.error(err)
+  }).catch(Error, function(err) {
+    console.error(err.stack)
     process.exit(1)
   })
 }
