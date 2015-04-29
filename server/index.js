@@ -8,7 +8,7 @@ module.exports = function loadServer() {
   })
 
   server.connection({
-    port: process.env.ELOVIZ_HTTP_PORT || 3000
+    port: process.env.FOODIE_HTTP_PORT || 3000
   })
 
   var register = P.promisify(server.register, server)
