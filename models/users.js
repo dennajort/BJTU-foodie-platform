@@ -25,6 +25,14 @@ module.exports = function(server) {
         unique: true,
         required: true
       },
+      firstname: {
+        type: "string",
+        required: true
+      },
+      lastname: {
+        type: "string",
+        required: true
+      },
       password: {
         type: "string",
         required: true
@@ -54,6 +62,8 @@ module.exports = function(server) {
     toJoi: function() {
       return Joi.object().keys({
         username: Joi.string(),
+        firstname: Joi.string(),
+        lastname: Joi.string(),
         email: Joi.string()
       }).unknown(true)
     }

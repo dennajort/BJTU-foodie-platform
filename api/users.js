@@ -44,6 +44,8 @@ module.exports = function(server) {
         validate: {
           payload: {
             username: Joi.string().required(),
+            firstname: Joi.string().required(),
+            lastname: Joi.string().required(),
             email: Joi.string().email().required(),
             password: Joi.string().required()
           }
