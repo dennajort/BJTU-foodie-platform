@@ -1,2 +1,7 @@
 var _ = require("lodash")
-module.exports = _.values(require("requireindex")(__dirname))
+
+module.exports = function(server) {
+  return _(require("requireindex")(__dirname)).values().map(function(f) {
+    return f(server)
+  }).value()
+}

@@ -47,7 +47,7 @@ module.exports = function loadServer() {
           adapters: {
             "sails-disk": require("sails-disk")
           },
-          models: require("../models")
+          models: require("../models")(server)
         }
       },
       {
@@ -58,7 +58,8 @@ module.exports = function loadServer() {
         }
       },
       require("./handlers"),
-      require("./oauth")
+      require("./oauth"),
+      require("./storage")
     ]),
     register(require("../api"), {routes: {prefix: "/api"}})
   ]
