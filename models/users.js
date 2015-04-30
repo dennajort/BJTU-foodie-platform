@@ -12,6 +12,7 @@ module.exports = function(server) {
   return {
     identity: "users",
     connection: "db",
+    migrate: "alter",
 
     attributes: {
       username: {

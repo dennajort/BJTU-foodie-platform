@@ -4,6 +4,7 @@ module.exports = function(server) {
   return {
     identity: "restaurants",
     connection: "db",
+    migrate: "alter",
 
     attributes: {
       name: {
