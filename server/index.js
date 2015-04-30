@@ -38,15 +38,30 @@ module.exports = function loadServer() {
         register: require("dogwater"),
         options: {
           connections: {
-            "db": {
-              adapter: "sails-disk",
-              filePath: "run/",
-              fileName: "eloviz.db"
+            "db": (function() {
+              if (process.env.NODE_ENV == "production") {
+                return {
+                  adapter: "sails-postgresql",
+                  database: 'foodie',
+                  host: process.env.POSTGRES_PORT_5432_TCP_ADDR,
+                  user: 'foodie',
+                  password: 'foodie',
+                  port: process.env.POSTGRES_PORT_5432_TCP_PORT
+                }
+              }
+              return {
+                adapter: "sails-disk",
+                filePath: "run/",
+                fileName: "eloviz.db"
+              }
+            })()
+          },
+          adapters: (function() {
+            if (process.env.NODE_ENV == "production") {
+              return {"sails-postgresql": require("sails-postgresql")}
             }
-          },
-          adapters: {
-            "sails-disk": require("sails-disk")
-          },
+            return {"sails-disk": require("sails-disk")}
+          })(),
           models: require("../models")(server)
         }
       },
