@@ -1,10 +1,13 @@
 #!/bin/bash
 
 set -x
-docker build --pull -t bjtu-foodie-platform:"$BUILD_ID" .
-docker stop bjtu-foodie && docker rm bjtu-foodie
+IMAGE="bjtu-foodie-platform"
+CONTAINER="bjtu-foodie"
+docker build --pull -t "$IMAGE":"$BUILD_ID" -t "$IMAGE":latest .
+(docker stop "$CONTAINER" && docker rm "$CONTAINER") || true
 docker run -d \
-  --name "bjtu-foodie" \
+  --name "$CONTAINER" \
   --link "postgres:postgres" \
   --restart "always" \
-  bjtu-foodie-platform:latest
+  -p "127.0.0.1:9090:3000" \
+  "$IMAGE":latest
