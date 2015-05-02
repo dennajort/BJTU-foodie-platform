@@ -13,16 +13,6 @@ module.exports = function loadServer() {
 
   var register = P.promisify(server.register, server)
 
-  server.ext("onPostHandler", function(req, rep) {
-    if (req.response instanceof Error && req.response.code == "E_VALIDATION") {
-      var b = Boom.badRequest("Database validation error")
-      b.output.payload.validation = {"keys": req.response.invalidAttributes}
-      return rep(b)
-    }
-
-    rep.continue()
-  })
-
   var plugins = [
     register([
       {
@@ -34,44 +24,8 @@ module.exports = function loadServer() {
           }]
         }
       },
-      {
-        register: require("dogwater"),
-        options: {
-          connections: {
-            "db": (function() {
-              if (process.env.NODE_ENV == "production") {
-                return {
-                  adapter: "sails-postgresql",
-                  database: 'foodie',
-                  host: process.env.POSTGRES_PORT_5432_TCP_ADDR,
-                  user: 'foodie',
-                  password: 'foodie',
-                  port: process.env.POSTGRES_PORT_5432_TCP_PORT
-                }
-              }
-              return {
-                adapter: "sails-disk",
-                filePath: "run/",
-                fileName: "eloviz.db"
-              }
-            })()
-          },
-          adapters: (function() {
-            if (process.env.NODE_ENV == "production") {
-              return {"sails-postgresql": require("sails-postgresql")}
-            }
-            return {"sails-disk": require("sails-disk")}
-          })(),
-          models: require("../models")(server)
-        }
-      },
-      {
-        register: require("bedwetter"),
-        options: {
-          prefix: "/api",
-          userIdProperty: "user.id"
-        }
-      },
+      require("./rest"),
+      require("./db"),
       require("./handlers"),
       require("./oauth"),
       require("./storage")

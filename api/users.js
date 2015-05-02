@@ -1,33 +1,19 @@
 var Joi = require("joi")
 
 module.exports = function(server) {
-  var Users = server.plugins.dogwater.users
+  var Rest = server.plugins.rest,
+    Users = server.plugins.db.users
 
   // User getters
   server.route([
-    {
-      path: "/users",
-      method: "GET",
-      config: {
-        description: "Get Users",
-        tags: ["Users"],
-        response: {schema: Joi.array().items(Users.toJoi())},
-        handler: {bedwetter: {}}
-      }
-    },
-    {
-      path: "/users/{id}",
-      method: "GET",
-      config: {
-        description: "Get one User",
-        tags: ["Users"],
-        response: {schema: Users.toJoi()},
-        validate: {
-          params: {id: Joi.string().required()}
-        },
-        handler: {bedwetter: {}}
-      }
-    }
+    Rest.findAll({
+      model: Users,
+      path: "/users"
+    }),
+    Rest.findOne({
+      model: Users,
+      path: "/users/{id}"
+    })
   ])
 
   // User setters
@@ -37,13 +23,12 @@ module.exports = function(server) {
       method: "POST",
       config: {
         description: "Add User",
-        tags: ["Users"],
+        tags: ["users"],
         response: {
           schema: Users.toJoi()
         },
         validate: {
           payload: {
-            username: Joi.string().required(),
             firstname: Joi.string().required(),
             lastname: Joi.string().required(),
             email: Joi.string().email().required(),
@@ -51,8 +36,9 @@ module.exports = function(server) {
           }
         },
         handler: function(req, rep) {
-          Users.setPassword(req.payload, req.payload.password).then(function(payload) {
-            return Users.create(payload).then(function(savedUser) {
+          var user = Users.build(req.payload)
+          user.setPassword(req.payload.password).then(function() {
+            return user.save().then(function(savedUser) {
               rep(savedUser)
             })
           }).catch(rep)

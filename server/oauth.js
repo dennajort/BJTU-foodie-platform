@@ -9,13 +9,13 @@ var APP_SECRET = "secret",
   EXP_TIME = 60 * 60 * 24 * 2,
   EXP_TIME_REFRESH = 60 * 60 * 24 * 15
 
-exports.register = function (server, options, next) {
-  var Users = server.plugins.dogwater.users
+exports.register = function(server, options, next) {
+  var Users = server.plugins.db.users
 
   var validateFunc = function(token, callback) {
     jwtVerifyAsync(token, APP_SECRET).then(function(data) {
       return Users.findOne(data.userId).then(function(user) {
-        if (user === undefined) return callback(null, false)
+        if (user === null) return callback(null, false)
         callback(undefined, true, {
           user: user,
           scope: data.scope || []
@@ -89,7 +89,7 @@ exports.register = function (server, options, next) {
 
         if (req.payload.grant_type == "password") {
           Users.findOne({email: req.payload.username}).then(function(user) {
-            if (user === undefined) return doError("invalid_grant")
+            if (user === null) return doError("invalid_grant")
             return Users.checkPassword(user, req.payload.password).then(function(ok) {
               if (ok) return generateTokens(user.id, scope)
               doError("invalid_grant")
@@ -120,5 +120,5 @@ exports.register = function (server, options, next) {
 
 exports.register.attributes = {
   name: "oauth",
-  dependencies: ["dogwater"]
+  dependencies: ["db"]
 }

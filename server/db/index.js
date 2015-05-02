@@ -1,40 +1,11 @@
 var Sequelize = require("sequelize"),
-    ValidationError = Sequelize.ValidationError,
-    Boom = require("boom"),
-    _ = require("lodash"),
-    Joi = require("joi")
+  ValidationError = Sequelize.ValidationError,
+  Umzug = require("umzug"),
+  Boom = require("boom"),
+  _ = require("lodash"),
+  path = require("path")
 
 exports.register = function(server, options, next) {
-  var c = require("./config"),
-      sequelize = new Sequelize(c.database, c.username, c.password, c.options),
-      schemas = {}
-
-  require("../../models")(server, sequelize)
-  _.forIn(sequelize.models, function(model, name) {
-    tmp = {}
-    _.forIn(model.attributes, function(attr, key) {
-      tmp[key] = (function() {
-        switch (attr.type.key) {
-          case "STRING": case "TEXT": case "UUID":
-            return Joi.string().allow("")
-          case "INTEGER": case "BIGINT":
-            return Joi.number().integer()
-          case "FLOAT": case "DECIMAL":
-            return Joi.number()
-          case "DATE":
-            return Joi.date()
-          case "BOOLEAN":
-            return Joi.boolean()
-          default:
-            return Joi.any()
-        }
-      })()
-    })
-    schemas[name] = Joi.object(tmp)
-      .meta({className: name})
-      .options({allowUnknown: true, stripUnknown: true})
-  })
-
   server.ext("onPostHandler", function(req, rep) {
     if (req.response instanceof ValidationError) {
       var b = Boom.badRequest("Database validation error")
@@ -44,11 +15,31 @@ exports.register = function(server, options, next) {
     rep.continue()
   })
 
-  sequelize.sync().then(function() {
-    server.expose("db", sequelize)
-    server.expose("models", sequelize.models)
-    server.expose("schemas", schemas)
-    next()
+  var c = require("./config")
+  var sequelize = new Sequelize(c.database, c.username, c.password, c.options)
+  var umzug = new Umzug({
+    storage: "sequelize",
+    storageOptions: {
+      sequelize: sequelize
+    },
+    migrations: {
+      params: [sequelize.getQueryInterface(), Sequelize],
+      path: path.join(__dirname, "..", "..", "migrations")
+    }
+  })
+
+  umzug.up().then(function(migrations) {
+    var models = require("../../models")
+    _.forEach(models.models, function(f) {
+      f(sequelize, server)
+    })
+    models.doAssociations(sequelize, server)
+    return sequelize.sync().then(function() {
+      _.forIn(sequelize.models, function(v, k) {
+        server.expose(k, v)
+      })
+      next()
+    })
   }).catch(next)
 }
 

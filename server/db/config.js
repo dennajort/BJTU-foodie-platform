@@ -1,19 +1,36 @@
 var path = require("path"),
-    fs = require("fs-extra"),
-    devSQLiteDir = path.join(__dirname, "..", "..", "run"),
-    util = require("util")
+  fs = require("fs-extra"),
+  devSQLiteDir = path.join(__dirname, "..", "..", "run"),
+  util = require("util"),
+  NODE_ENV = process.env.NODE_ENV
 
-if (process.env.NODE_ENV == "development") fs.mkdirsSync(devSQLiteDir)
+if (NODE_ENV == "development") fs.mkdirsSync(devSQLiteDir)
 
-module.exports = {
-  database: "foodie",
-  username: null,
-  password: null,
-  options:{
-    logging: util.debuglog("app:db:sequelize"),
-    dialect: "sqlite",
-    storage: path.join(devSQLiteDir, "eloviz.db"),
-    host: undefined,
-    port: undefined
+var configs = {
+  "development": {
+    database: "foodie",
+    username: null,
+    password: null,
+    options: {
+      dialect: "sqlite",
+      storage: path.join(devSQLiteDir, "eloviz.db")
+    }
+  },
+  "production": {
+    database: "foodie",
+    username: "foodie",
+    password: "foodie",
+    options: {
+      dialect: "postgres",
+      logging: util.debuglog("app:db:sequelize"),
+      host: process.env.POSTGRES_PORT_5432_TCP_ADDR,
+      port: process.env.POSTGRES_PORT_5432_TCP_PORT
+    }
   }
+}
+
+module.exports = configs[NODE_ENV] || configs.development
+module.exports.options.define = {
+  timestamps: false,
+  freezeTableName: true
 }

@@ -1,73 +1,46 @@
 var Joi = require("joi")
 
 module.exports = function(server) {
-  var Restaurants = server.plugins.dogwater.restaurants
+  var Rest = server.plugins.rest,
+    Restaurants = server.plugins.db.restaurants,
+    Users = server.plugins.db.users
 
   // Restaurant getters
   server.route([
-    {
-      path: "/restaurants",
-      method: "GET",
-      config: {
-        description: "Get Restaurants",
-        tags: ["Restaurants"],
-        response: {schema: Joi.array().items(Restaurants.toJoi())},
-        handler: {bedwetter: {}}
-      }
-    },
-    {
-      path: "/restaurants/{id}",
-      method: "GET",
-      config: {
-        description: "Get one Restaurant",
-        tags: ["Restaurants"],
-        response: {schema: Restaurants.toJoi()},
-        validate: {
-          params: {id: Joi.string().required()}
-        },
-        handler: {bedwetter: {}}
-      }
-    },
-    {
+    Rest.findAll({
+      model: Restaurants,
+      path: "/restaurants"
+    }),
+    Rest.findOne({
+      model: Restaurants,
+      path: "/restaurants/{id}"
+    }),
+    Rest.findRelated({
+      model: Restaurants,
+      parent: Users,
       path: "/users/{id}/restaurants",
-      method: "GET",
-      config: {
-        description: "Get Restaurants of User",
-        tags: ["Restaurants", "Users"],
-        validate: {
-          params: {id: Joi.string().required()}
-        },
-        response: {schema: Joi.array().items(Restaurants.toJoi())},
-        handler: {bedwetter: {}}
-      }
-    }
+      fk: "owner"
+    })
   ])
 
   // Restaurant setters
   server.route([
-    {
-      path: "/restaurants",
-      method: "POST",
-      config: {
-        description: "Add Restaurant",
-        tags: ["Restaurants"],
-        response: {schema: Restaurants.toJoi()},
-        validate: {
-          payload: {
-            name: Joi.string().required(),
-            description: Joi.string().default(""),
-            address: Joi.string().required(),
-            longitude: Joi.number().required(),
-            latitude: Joi.number().required()
-          }
-        },
-        auth: "oauth",
-        handler: {bedwetter: {
-          actAsUser: true,
-          setOwner: true,
-          requireOwner: true
-        }}
+    Rest.create({
+      path: "/me/restaurants",
+      model: Restaurants,
+      auth: "oauth",
+      setOwner: true,
+      ownerField: "owner",
+      payload: {
+        name: Joi.string().required(),
+        short_description: Joi.string().required(),
+        long_description: Joi.string().default(""),
+        phone: Joi.string().required(),
+        email: Joi.string().required(),
+        address: Joi.string().required(),
+        longitude: Joi.number().required(),
+        latitude: Joi.number().required()
       }
-    }
+    })
   ])
 }
