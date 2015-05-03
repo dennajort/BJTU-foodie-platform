@@ -11,6 +11,8 @@ exports.register = function(server, options, done) {
     server.expose({
       findAll: function(o) {
         var m = o.model
+        var tags = [m.name]
+        if (o.asOwner) tags.push("me")
         var query = m.queryJoi()
         query.limit = Joi.number().integer()
         query.offset = Joi.number().integer()
@@ -19,12 +21,13 @@ exports.register = function(server, options, done) {
           method: "GET",
           config: {
             description: `Get ${m.name}`,
-            tags: [m.name],
+            tags: tags,
             response: {schema: Joi.array().items(m.toJoi())},
             validate: {query: query},
             auth: o.auth || false,
             handler: function(req, rep) {
               var where = _.omit(req.query, ["limit", "offset"])
+              if (o.asOwner) where[o.ownerField] = getOwnerFromAuth(req)
               m.findAll({
                 where: where,
                 limit: req.limit,

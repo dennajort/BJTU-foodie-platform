@@ -12,6 +12,13 @@ module.exports = function(server) {
       model: Restaurants,
       path: "/restaurants"
     }),
+    Rest.findAll({
+      model: Restaurants,
+      path: "/me/restaurants",
+      auth: "oauth",
+      asOwner: true,
+      ownerField: "owner"      
+    }),
     Rest.findOne({
       model: Restaurants,
       path: "/restaurants/{id}"
