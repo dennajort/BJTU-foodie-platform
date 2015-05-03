@@ -13,7 +13,7 @@ var configs = {
     password: null,
     options: {
       dialect: "sqlite",
-      storage: path.join(devSQLiteDir, "eloviz.db")
+      storage: path.join(devSQLiteDir, "foodie.db")
     }
   },
   "production": {
