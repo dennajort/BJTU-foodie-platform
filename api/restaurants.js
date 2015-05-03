@@ -33,6 +33,21 @@ module.exports = function(server) {
       setOwner: true,
       ownerField: "owner",
       payload: _.omit(Restaurants.joiAttributes(), "owner")
+    }),
+    Rest.destroyOne({
+      path: "/me/restaurants/{id}",
+      model: Restaurants,
+      auth: "oauth",
+      asOwner: true,
+      ownerField: "owner"
+    }),
+    Rest.updateOne({
+      path: "/me/restaurants/{id}",
+      model: Restaurants,
+      auth: "oauth",
+      asOwner: true,
+      ownerField: "owner",
+      payload: _.omit(Restaurants.joiAttributes(), "owner")
     })
   ])
 }

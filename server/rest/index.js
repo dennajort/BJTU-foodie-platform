@@ -110,6 +110,56 @@ exports.register = function(server, options, done) {
             }
           }
         }
+      },
+      destroyOne: function(o) {
+        var m = o.model
+        var tags = [m.name]
+        if (o.asOwner) tags.push("me")
+        return {
+          path: o.path,
+          method: "DELETE",
+          config: {
+            description: `Delete a ${m.name}`,
+            tags: tags,
+            validate: {params: {id: Joi.number().integer().required()}},
+            auth: o.auth || false,
+            handler: function(req, rep) {
+              var where = {id: req.params.id}
+              if (o.asOwner) where[o.ownerField] = getOwnerFromAuth(req)
+              m.destroy({limit: 1, where: where}).then(function() {
+                rep()
+              }).catch(rep)
+            }
+          }
+        }
+      },
+      updateOne: function(o) {
+        var m = o.model
+        var tags = [m.name]
+        if (o.asOwner) tags.push("me")
+        return {
+          path: o.path,
+          method: "PUT",
+          config: {
+            description: `Update a ${m.name}`,
+            tags: tags,
+            validate: {
+              params: {id: Joi.number().integer().required()},
+              payload: o.payload
+            },
+            auth: o.auth || false,
+            handler: function(req, rep) {
+              var where = {id: req.params.id}
+              if (o.asOwner) where[o.ownerField] = getOwnerFromAuth(req)
+              m.findOne({where: where}).then(function(entry) {
+                if (entry === null) throw Boom.notFound()
+                return entry.update(req.payload).then(function(upEntry) {
+                  rep(upEntry)
+                })
+              }).catch(rep)
+            }
+          }
+        }
       }
     })
     next()
