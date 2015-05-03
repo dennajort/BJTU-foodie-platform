@@ -18,6 +18,6 @@ EXPOSE  3000
 RUN set -x && mkdir -p /foodie/platform $FOODIE_UPLOADS_DIR
 WORKDIR /foodie/platform
 COPY  package.json package.json
-RUN set -x && npm install && rm -rf /root/.node-gyp /root/.npm /tmp/npm*
+RUN set -x && npm install --no-color && rm -rf /root/.node-gyp /root/.npm /tmp/npm*
 COPY  ./ ./
 CMD ["node", "."]
