@@ -1,16 +1,25 @@
 var Sequelize = require("sequelize"),
-  ValidationError = Sequelize.ValidationError,
   Umzug = require("umzug"),
   Boom = require("boom"),
   _ = require("lodash"),
-  path = require("path")
+  path = require("path"),
+  Joi = require("joi")
 
 exports.register = function(server, options, next) {
   server.ext("onPostHandler", function(req, rep) {
-    if (req.response instanceof ValidationError) {
+    var res = req.response
+    if (res instanceof Sequelize.ValidationError) {
       var b = Boom.badRequest("Database validation error")
-      b.output.payload.validation = {"keys": req.response.fields}
+      b.output.payload.validation = {"keys": res.fields}
       return rep(b)
+    } else if (res.statusCode == 200) {
+      var instanceArray = Joi.array().items(Joi.object().type(Sequelize.Instance).required())
+      if (res.source === undefined) {
+      } else if (res.source instanceof Sequelize.Instance) {
+        return rep(req.response.source.toJSON())
+      } else if (instanceArray.validate(res.source).error === null) {
+        return rep(_.map(res.source, function(e) {return e.toJSON()}))
+      }
     }
     rep.continue()
   })

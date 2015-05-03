@@ -122,12 +122,13 @@ exports.register = function(server, options, done) {
             description: `Delete a ${m.name}`,
             tags: tags,
             validate: {params: {id: Joi.number().integer().required()}},
+            response: {status: {"204": Joi}},
             auth: o.auth || false,
             handler: function(req, rep) {
               var where = {id: req.params.id}
               if (o.asOwner) where[o.ownerField] = getOwnerFromAuth(req)
               m.destroy({limit: 1, where: where}).then(function() {
-                rep()
+                rep().code(204).type('application/json')
               }).catch(rep)
             }
           }
@@ -147,6 +148,7 @@ exports.register = function(server, options, done) {
               params: {id: Joi.number().integer().required()},
               payload: o.payload
             },
+            response: {schema: m.toJoi()},
             auth: o.auth || false,
             handler: function(req, rep) {
               var where = {id: req.params.id}
