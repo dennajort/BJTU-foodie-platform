@@ -1,4 +1,5 @@
-var Joi = require("joi")
+var Joi = require("joi"),
+  _ = require("lodash")
 
 module.exports = function(server) {
   var Rest = server.plugins.rest,
@@ -31,16 +32,7 @@ module.exports = function(server) {
       auth: "oauth",
       setOwner: true,
       ownerField: "owner",
-      payload: {
-        name: Joi.string().required(),
-        short_description: Joi.string().required(),
-        long_description: Joi.string().default(""),
-        phone: Joi.string().required(),
-        email: Joi.string().required(),
-        address: Joi.string().required(),
-        longitude: Joi.number().required(),
-        latitude: Joi.number().required()
-      }
+      payload: _.omit(Restaurants.joiAttributes(), "owner")
     })
   ])
 }

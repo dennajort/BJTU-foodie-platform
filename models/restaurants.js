@@ -68,6 +68,19 @@ module.exports = function(db, server) {
   }, {
     tableName: "restaurants",
     classMethods: {
+      joiAttributes: function() {
+        return {
+          name: Joi.string().required(),
+          short_description: Joi.string().required(),
+          long_description: Joi.string().default(""),
+          email: Joi.string().email().required(),
+          phone: Joi.string().required(),
+          address: Joi.string().required(),
+          longitude: Joi.number().required(),
+          latitude: Joi.number().required(),
+          owner: Joi.number().integer().required()
+        }
+      },
       toJoi: function() {
         return {
           id: Joi.number().integer(),

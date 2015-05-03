@@ -51,6 +51,14 @@ module.exports = function(db, server) {
   }, {
     tableName: "users",
     classMethods: {
+      joiAttributes: function() {
+        return {
+          firstname: Joi.string().required(),
+          lastname: Joi.string().required(),
+          email: Joi.string().email().required(),
+          password: Joi.string().required()
+        }
+      },
       toJoi: function() {
         return {
           id: Joi.number().integer(),

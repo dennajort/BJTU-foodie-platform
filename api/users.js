@@ -28,12 +28,7 @@ module.exports = function(server) {
           schema: Users.toJoi()
         },
         validate: {
-          payload: {
-            firstname: Joi.string().required(),
-            lastname: Joi.string().required(),
-            email: Joi.string().email().required(),
-            password: Joi.string().required()
-          }
+          payload: Users.joiAttributes()
         },
         handler: function(req, rep) {
           var user = Users.build(req.payload)
