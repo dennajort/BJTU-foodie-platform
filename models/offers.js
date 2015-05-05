@@ -48,6 +48,13 @@ module.exports = function(db, server) {
     }
   }, {
     tableName: "offers",
+    instanceMethods: {
+      isOwner: function(oid) {
+        return this.getRestaurant().then(function(resto) {
+          return resto.isOwner(oid)
+        })
+      }
+    },
     classMethods: {
       joiAttributes: function() {
         return {
@@ -55,7 +62,7 @@ module.exports = function(db, server) {
           description: Joi.string().required(),
           restaurant: Joi.number().integer().required(),
           expiration_date: Joi.date().required(),
-          limit_coupon: Joi.number().integer(),
+          limit_coupon: Joi.number().integer().greater(0),
           remaining: Joi.number().integer()
         }
       },

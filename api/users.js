@@ -18,27 +18,16 @@ module.exports = function(server) {
 
   // User setters
   server.route([
-    {
+    Rest.create({
+      model: Users,
       path: "/users",
-      method: "POST",
-      config: {
-        description: "Add User",
-        tags: ["users"],
-        response: {
-          schema: Users.toJoi()
-        },
-        validate: {
-          payload: Users.joiAttributes()
-        },
-        handler: function(req, rep) {
-          Users.hashPassword(req.payload.password).then(function(enc_password) {
-            req.payload.password = enc_password
-            return Users.create(req.payload).then(function(user) {
-              rep(user)
-            })
-          }).catch(rep)
-        }
+      payload: Users.joiAttributes(),
+      preCreate: function(payload) {
+        return Users.hashPassword(payload.password).then(function(enc_password) {
+          payload.password = enc_password
+          return payload
+        })
       }
-    }
+    })
   ])
 }

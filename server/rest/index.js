@@ -1,6 +1,7 @@
 var Joi = require("joi"),
   _ = require("lodash"),
-  Boom = require("boom")
+  Boom = require("boom"),
+  P = require("bluebird")
 
 exports.register = function(server, options, done) {
   server.dependency("db", function(server, next) {
@@ -95,6 +96,7 @@ exports.register = function(server, options, done) {
         var m = o.model
         var tags = [m.name]
         if (o.setOwner) tags.push("me")
+        var preCreate = o.preCreate || P.resolve
         return {
           path: o.path,
           method: "POST",
@@ -107,8 +109,10 @@ exports.register = function(server, options, done) {
             handler: function(req, rep) {
               var payload = req.payload
               if (o.setOwner) payload[o.ownerField] = getOwnerFromAuth(req)
-              m.create(payload).then(function(entry) {
-                rep(entry)
+              preCreate(payload).then(function(new_payload) {
+                return m.create(new_payload).then(function(entry) {
+                  rep(entry)
+                })
               }).catch(rep)
             }
           }
@@ -128,10 +132,17 @@ exports.register = function(server, options, done) {
             response: {status: {"204": Joi}},
             auth: o.auth || false,
             handler: function(req, rep) {
-              var where = {id: req.params.id}
-              if (o.asOwner) where[o.ownerField] = getOwnerFromAuth(req)
-              m.destroy({limit: 1, where: where}).then(function() {
-                rep().code(204).type('application/json')
+              m.findOne(req.params.id).then(function(entry) {
+                if (entry === null) throw Boom.notFound()
+                if (o.asOwner) return entry.isOwner(getOwnerFromAuth(req)).then(function(ok) {
+                  if (ok) return entry
+                  throw Boom.unauthorized()
+                })
+                return entry
+              }).then(function(entry) {
+                return m.destroy().then(function() {
+                  rep().code(204).type('application/json')
+                })
               }).catch(rep)
             }
           }
@@ -154,12 +165,55 @@ exports.register = function(server, options, done) {
             response: {schema: m.toJoi()},
             auth: o.auth || false,
             handler: function(req, rep) {
-              var where = {id: req.params.id}
-              if (o.asOwner) where[o.ownerField] = getOwnerFromAuth(req)
-              m.findOne({where: where}).then(function(entry) {
+              m.findOne(req.params.id).then(function(entry) {
                 if (entry === null) throw Boom.notFound()
+                if (o.asOwner) return entry.isOwner(getOwnerFromAuth(req)).then(function(ok) {
+                  if (ok) return entry
+                  throw Boom.unauthorized()
+                })
+                return entry
+              }).then(function(entry) {
                 return entry.update(req.payload).then(function(upEntry) {
                   rep(upEntry)
+                })
+              }).catch(rep)
+            }
+          }
+        }
+      },
+      createRelated: function(o) {
+        var m = o.model
+        var pm = o.parent
+        var tags = [m.name, pm.name]
+        if (o.asOwner) tags.push("me")
+        var preCreate = o.preCreate || P.resolve
+        return {
+          path: o.path,
+          method: "POST",
+          config: {
+            description: `Create a ${m.name} of one ${pm.name}`,
+            tags: tags,
+            response: {schema: m.toJoi()},
+            validate: {
+              payload: o.payload,
+              params: {id: Joi.number().integer().required()}
+            },
+            auth: o.auth || false,
+            handler: function(req, rep) {
+              var payload = req.payload
+              pm.findOne(req.params.id).then(function(mypm) {
+                if (mypm === null) throw Boom.notFound()
+                if (o.asOwner) return pm.isOwner(getOwnerFromAuth(req)).then(function(ok) {
+                  if (ok) return mypm
+                  throw Boom.unauthorized()
+                })
+                return mypm
+              }).then(function(mypm) {
+                payload[o.fk] = mypm.id
+                return preCreate(payload).then(function(new_payload) {
+                  return m.create(new_payload).then(function(entry) {
+                    rep(entry)
+                  })
                 })
               }).catch(rep)
             }

@@ -83,15 +83,13 @@ module.exports = function(server) {
       path: "/me/restaurants/{id}",
       model: Restaurants,
       auth: "oauth",
-      asOwner: true,
-      ownerField: "owner"
+      asOwner: true
     }),
     Rest.updateOne({
       path: "/me/restaurants/{id}",
       model: Restaurants,
       auth: "oauth",
       asOwner: true,
-      ownerField: "owner",
       payload: _.omit(Restaurants.joiAttributes(), "owner")
     })
   ])

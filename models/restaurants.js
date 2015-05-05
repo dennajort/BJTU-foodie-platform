@@ -1,4 +1,5 @@
 var Joi = require("joi"),
+  P = require("bluebird"),
   Sequelize = require("sequelize"),
   STRING = Sequelize.STRING,
   INTEGER = Sequelize.INTEGER,
@@ -67,6 +68,11 @@ module.exports = function(db, server) {
     }
   }, {
     tableName: "restaurants",
+    instanceMethods: {
+      isOwner: function(oid) {
+        return P.resolve(oid == this.owner)
+      }
+    },
     classMethods: {
       joiAttributes: function() {
         return {
