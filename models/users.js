@@ -7,10 +7,6 @@ var P = require("bluebird"),
   STRING = Sequelize.STRING,
   INTEGER = Sequelize.INTEGER
 
-function hashPassword(passwd) {
-  return hashAsync(passwd, 10)
-}
-
 module.exports = function(db, server) {
   db.define("users", {
     id: {
@@ -73,6 +69,9 @@ module.exports = function(db, server) {
           firstname: Joi.string(),
           lastname: Joi.string()
         }
+      },
+      hashPassword: function(passwd) {
+        return hashAsync(passwd, 10)
       }
     },
     instanceMethods: {
@@ -80,11 +79,6 @@ module.exports = function(db, server) {
         var user = Sequelize.Instance.prototype.toJSON.call(this)
         delete user.password
         return user
-      },
-      setPassword: function(passwd) {
-        return hashAsync(passwd, 10).bind(this).then(function(enc_passwd) {
-          this.password = enc_passwd
-        })
       },
       checkPassword: function(passwd) {
         return compareAsync(passwd, this.password)

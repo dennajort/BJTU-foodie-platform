@@ -31,10 +31,10 @@ module.exports = function(server) {
           payload: Users.joiAttributes()
         },
         handler: function(req, rep) {
-          var user = Users.build(req.payload)
-          user.setPassword(req.payload.password).then(function() {
-            return user.save().then(function(savedUser) {
-              rep(savedUser)
+          Users.hashPassword(req.payload.password).then(function(enc_password) {
+            req.payload.password = enc_password
+            return Users.create(req.payload).then(function(user) {
+              rep(user)
             })
           }).catch(rep)
         }
