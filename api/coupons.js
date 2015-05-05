@@ -4,8 +4,10 @@ var Joi = require("joi"),
 
 module.exports = function(server) {
   var Rest = server.plugins.rest,
-    Coupons = server.plugins.db.coupons,
-    Offers = server.plugins.db.offers
+    DB = server.plugins.db,
+    Coupons = DB.coupons,
+    Offers = DB.offers,
+    Restaurants = DB.restaurants
 
   // Coupons getters
   server.route([
@@ -71,13 +73,17 @@ module.exports = function(server) {
         response: {
           schema: {
             valid: Joi.boolean(),
-            offer: Offers.toJoi()
+            offer: Offers.toJoi(),
+            restaurant: Restaurants.toJoi()
           }
         },
         validate: {query: {secret: Joi.string().required()}},
         handler: function(req, rep) {
           getInfoCoupon(req.query.secret, req.auth.credentials.user.id).then(function(infos) {
-            rep({valid: infos.valid, offer: infos.offer})
+            return infos.offer.getRestaurant().then(function(resto) {
+              if (resto === null) return rep({valid: false})
+              rep({valid: infos.valid, offer: infos.offer, restaurant: resto})
+            })
           }).catch(rep)
         }
       }
