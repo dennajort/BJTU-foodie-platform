@@ -26,7 +26,7 @@ module.exports = function(server) {
     path: "/me/offers/{id}/coupons",
     config: {
       description: "Create a coupon from an offer",
-      tags: ["offers", "coupons", "me"],
+      tags: [Offers.name, Coupons.name, "me"],
       auth: "oauth",
       response: {schema: Coupons.toJoi()},
       validate: {params: {id: Joi.number().integer().required()}},
@@ -69,7 +69,7 @@ module.exports = function(server) {
       config: {
         description: "Get infos about a coupon before validating it",
         auth: "oauth",
-        tags: ["coupons", "me"],
+        tags: [Coupons.name, "me"],
         response: {
           schema: {
             valid: Joi.boolean(),
@@ -93,7 +93,7 @@ module.exports = function(server) {
       config: {
         description: "Use a coupon",
         auth: "oauth",
-        tags: ["coupons", "me"],
+        tags: [Coupons.name, "me"],
         response: {schema: {ok: Joi.boolean()}},
         validate: {payload: {secret: Joi.string().required()}},
         handler: function(req, rep) {
