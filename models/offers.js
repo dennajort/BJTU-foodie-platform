@@ -62,8 +62,7 @@ module.exports = function(db, server) {
           description: Joi.string().required(),
           restaurant: Joi.number().integer().required(),
           expiration_date: Joi.date().required(),
-          limit_coupon: Joi.number().integer().greater(0),
-          remaining: Joi.number().integer()
+          limit_coupon: Joi.number().integer().greater(0)
         }
       },
       toJoi: function() {

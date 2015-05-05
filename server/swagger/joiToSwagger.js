@@ -45,6 +45,11 @@ function joiObject(d) {
   return addCommon(d, v)
 }
 
+function joiDate(d) {
+  var v = {type: "string", format: "date-time"}
+  return addCommon(d, v)
+}
+
 function joiAlternatives(d) {
   return joiString({})
 }
@@ -56,6 +61,7 @@ function joiChoose(d) {
     case "number": return joiNumber(d)
     case "boolean": return joiBoolean(d)
     case "string": return joiString(d)
+    case "date": return joiDate(d)
     case "alternatives": return joiAlternatives(d)
     default: return undefined
   }
