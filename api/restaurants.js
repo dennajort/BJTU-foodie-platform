@@ -1,5 +1,6 @@
 var Joi = require("joi"),
-  _ = require("lodash")
+  _ = require("lodash"),
+  geo = require("geolib")
 
 module.exports = function(server) {
   var Rest = server.plugins.rest,
@@ -11,6 +12,7 @@ module.exports = function(server) {
     path: "/restaurants/near",
     config: {
       description: "Find restaurants around a location",
+      notes: "radius is in meters",
       tags: [Restaurants.name],
       response: {
         schema: Joi.array().items(Joi.object().keys({
@@ -27,14 +29,11 @@ module.exports = function(server) {
       },
       handler: function(req, rep) {
         var q = req.query
-        Restaurants.findAll({where: {
-          longitude: {lte: q.longitude + q.radius, gte: q.longitude - q.radius},
-          latitude: {lte: q.latitude + q.radius, gte: q.latitude - q.radius}
-        }}).then(function(restos) {
+        Restaurants.findAll().then(function(restos) {
           rep(_(restos).map(function(r) {
             return {
               restaurant: r.toJSON(),
-              distance: Math.sqrt(Math.pow(r.latitude - q.latitude) + Math.pow(r.longitude - q.longitude))
+              distance: geo.getDistance(q, r)
             }
           }).filter(function(v) {
             return v.distance >= q.radius
