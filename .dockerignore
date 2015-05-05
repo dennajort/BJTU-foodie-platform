@@ -1,3 +1,7 @@
 .git/*
 node_modules/*
 run/*
+.gitignore
+.jshintrc
+Gruntfile.js
+jenkins.sh
