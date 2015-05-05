@@ -38,13 +38,15 @@ module.exports = function(db, server) {
     limit_coupon: {
       type: INTEGER,
       allowNull: true,
+      defaultValue: null,
       validate: {
         min: 1
       }
     },
     remaining: {
       type: INTEGER,
-      allowNull: true
+      allowNull: true,
+      defaultValue: null
     }
   }, {
     tableName: "offers",
@@ -53,6 +55,9 @@ module.exports = function(db, server) {
         return this.getRestaurant().then(function(resto) {
           return resto.isOwner(oid)
         })
+      },
+      isExpired: function() {
+        return (new Date()) > this.expiration_date
       }
     },
     classMethods: {
@@ -61,14 +66,14 @@ module.exports = function(db, server) {
           name: Joi.string().required(),
           description: Joi.string().required(),
           restaurant: Joi.number().integer().required(),
-          expiration_date: Joi.date().required(),
+          expiration_date: Joi.date().iso().required(),
           limit_coupon: Joi.number().integer().greater(0)
         }
       },
       toJoi: function() {
         return {
           id: Joi.number().integer(),
-          name: Joi.string().required(),
+          name: Joi.string(),
           description: Joi.string(),
           restaurant: Joi.number().integer(),
           expiration_date: Joi.date(),
