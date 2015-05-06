@@ -98,7 +98,7 @@ exports.register = function(server, options, next) {
         } else if (req.payload.grant_type == "refresh_token"){
           jwtVerifyAsync(req.payload.refresh_token, APP_SECRET).then(function(data) {
             if (_.every(scope, function(s) {return _.includes(data.scope, s)})) {
-              return generateTokens(data.id, scope)
+              return generateTokens(data.userId, scope)
             }
             doError("invalid_scope")
           }).catch(jwt.TokenExpiredError, function(err) {
