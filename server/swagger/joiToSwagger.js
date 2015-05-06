@@ -1,4 +1,5 @@
-var _ = require("lodash")
+var _ = require("lodash"),
+  Joi = require("joi")
 
 function addCommon(d, v) {
   if (d.flags && d.flags.default) {
@@ -68,5 +69,5 @@ function joiChoose(d) {
 }
 
 module.exports = function joiToSwagger(j) {
-  return joiChoose((_.isObject(j) && j.isJoi === true) ? j.describe() : j)
+  return joiChoose((_.isObject(j) && j.isJoi === true) ? j.describe() : Joi.object(j).describe())
 }

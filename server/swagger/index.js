@@ -80,7 +80,7 @@ function makeHandler(server) {
     rep({
       swagger: "2.0",
       info: {
-        title: "Eloviz API",
+        title: "Foodie API",
         version: require("../../package.json").version
       },
       paths: makePaths(server),
