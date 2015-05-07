@@ -33,7 +33,7 @@ function joiArray(d) {
     if (_.isArray(i) && i.length > 0) return joiChoose(i[0])
     return {type: "string"}
   })(d.items)
-  return addCommon(d, {type: "array", items: items})
+  return addCommon(d, {type: "array", items: items, collectionFormat: "multi"})
 }
 
 function joiObject(d) {

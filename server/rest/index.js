@@ -10,6 +10,21 @@ exports.register = function(server, options, done) {
       return req.auth.credentials.user.id
     }
 
+    function parseOrder(order) {
+      return _(order).map(function(v) {
+        var tmp = v.trim()
+        if (tmp.lengt === 0) return
+        tmp = tmp.split(/\s+/)
+        switch (tmp.length) {
+          case 1: return tmp[0]
+          case 2: return tmp
+          default: return undefined
+        }
+      }).filter(function(v) {
+        return v !== undefined
+      }).value()
+    }
+
     server.expose({
       findAll: function(o) {
         var m = o.model
@@ -18,6 +33,7 @@ exports.register = function(server, options, done) {
         var query = m.queryJoi()
         query.limit = Joi.number().integer()
         query.offset = Joi.number().integer()
+        query.order = Joi.array().items(Joi.string()).single(true)
         return {
           path: o.path,
           method: "GET",
@@ -28,12 +44,13 @@ exports.register = function(server, options, done) {
             validate: {query: query},
             auth: o.auth || false,
             handler: function(req, rep) {
-              var where = _.omit(req.query, ["limit", "offset"])
+              var where = _.omit(req.query, ["limit", "offset", "order"])
               if (o.asOwner) where[o.ownerField] = getOwnerFromAuth(req)
               m.findAll({
                 where: where,
-                limit: req.limit,
-                offset: req.offset
+                limit: req.query.limit,
+                offset: req.query.offset,
+                order: parseOrder(req.query.order)
               }).then(function(entries) {
                 rep(entries)
               }).catch(rep)
@@ -67,6 +84,7 @@ exports.register = function(server, options, done) {
         var query = _.omit(m.queryJoi(), o.fk)
         query.limit = Joi.number().integer()
         query.offset = Joi.number().integer()
+        query.order = Joi.array().items(Joi.string()).single(true)
         return {
           path: o.path,
           method: "GET",
@@ -80,12 +98,13 @@ exports.register = function(server, options, done) {
             },
             auth: o.auth || false,
             handler: function(req, rep) {
-              var where = _.omit(req.query, ["limit", "offset"])
+              var where = _.omit(req.query, ["limit", "offset", "order"])
               where[o.fk] = req.params.id
               m.findAll({
                 where: where,
-                limit: req.limit,
-                offset: req.offset
+                limit: req.query.limit,
+                offset: req.query.offset,
+                order: parseOrder(req.query.order)
               }).then(function(entries) {
                 rep(entries)
               }).catch(rep)
