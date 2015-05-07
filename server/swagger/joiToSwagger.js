@@ -37,6 +37,10 @@ function joiArray(d) {
 
 function joiObject(d) {
   var prop = {}
+  var isFile = _.some(d.meta || [], function(m) {
+    return m.swaggerFile === true
+  })
+  if (isFile) return {type: "file"}
   if (_.isObject(d.children)) {
     _.forIn(d.children, function(val, key) {
       prop[key] = joiChoose(val)

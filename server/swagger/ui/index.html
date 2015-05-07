@@ -26,16 +26,7 @@
         url: "/api/swagger.json",
         dom_id: "swagger-ui-container",
         supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
-        onComplete: function(swaggerApi, swaggerUi){
-          if(typeof initOAuth == "function") {
-            /*
-            initOAuth({
-              clientId: "your-client-id",
-              realm: "your-realms",
-              appName: "your-app-name"
-            });
-            */
-          }
+        onComplete: function(swaggerApi, swaggerUi) {
           $('pre code').each(function(i, e) {
             hljs.highlightBlock(e);
           });
@@ -58,13 +49,6 @@
       }
 
       $('#input_apiKey').change(addApiKeyAuthorization);
-
-      // if you have an apiKey you would like to pre-populate on the page for demonstration purposes...
-      /*
-        var apiKey = "myApiKeyXXXX123456789";
-        $('#input_apiKey').val(apiKey);
-        addApiKeyAuthorization();
-      */
 
       window.swaggerUi.load();
 

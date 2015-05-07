@@ -40,6 +40,10 @@ IStorage.prototype.downloadStream = function(name, file) {
   throw new Error("Not implemented")
 }
 
+IStorage.prototype.upload = function(name, file, stream) {
+  throw new Error("Not implemented")
+}
+
 IStorage.prototype.uploadStream = function(name, file) {
   throw new Error("Not implemented")
 }

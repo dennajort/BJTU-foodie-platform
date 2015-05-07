@@ -1,6 +1,7 @@
 var Joi = require("joi"),
   FlakeID = require("flake-idgen"),
   fid = new FlakeID(),
+  intformat = require('biguint-format'),
   P = require("bluebird"),
   Sequelize = require("sequelize"),
   STRING = Sequelize.STRING,

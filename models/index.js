@@ -60,7 +60,8 @@ exports.doAssociations = function(db) {
   Restaurants.hasMany(RestaurantPictures, {
     as: "Pictures",
     foreignKey: "restaurant",
-    onDelete: "CASCADE"
+    onDelete: "CASCADE",
+    hooks: true
   })
   RestaurantPictures.belongsTo(Restaurants, {
     as: "Restaurant",

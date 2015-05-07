@@ -1,7 +1,7 @@
 var _ = require("lodash")
 
 exports.register = function(server, options, done) {
-  server.dependency("db", function(server, next) {
+  server.dependency(["db", "storage"], function(server, next) {
     _.forIn(require("requireindex")(__dirname), function(part) {
       part(server)
     })
@@ -12,5 +12,5 @@ exports.register = function(server, options, done) {
 
 exports.register.attributes = {
   name: "api",
-  dependencies: ["db", "oauth"]
+  dependencies: ["db", "storage", "oauth"]
 }

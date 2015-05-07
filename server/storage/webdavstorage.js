@@ -119,11 +119,27 @@ WebDavStorage.prototype.downloadStream = function(name, file) {
   })
 }
 
+WebDavStorage.prototype.upload = function(name, file, stream) {
+  return this.uploadStream(name, file).then(function(out) {
+    return new P(function(resolve, reject) {
+      stream.pipe(out)
+      out.on("finish", function() {
+        resolve()
+      })
+      out.on("error", function() {
+        reject()
+      })
+    })
+  })
+}
+
 WebDavStorage.prototype.uploadStream = function(name, file) {
-  return P.resolve(this._req({
+  var dup = new PassThrough()
+  dup.pipe(this._req({
     method: "PUT",
     uri: "/" + name + "/" + file
   }))
+  return P.resolve(dup)
 }
 
 module.exports = WebDavStorage

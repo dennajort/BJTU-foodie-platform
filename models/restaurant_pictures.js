@@ -6,15 +6,7 @@ var Joi = require("joi"),
   BOOLEAN = Sequelize.BOOLEAN
 
 module.exports = function(db, server) {
-
-  server.dependency("storage", function(server, done) {
-    var store = server.plugins.storage.store
-    store.createContainer("restaurants").then(function() {
-      done()
-    }).catch(done)
-  })
-
-  db.define("restaurant_pictures", {
+  var Pictures = db.define("restaurant_pictures", {
     id: {
       type: INTEGER,
       primaryKey: true,
@@ -74,5 +66,16 @@ module.exports = function(db, server) {
         }
       }
     }
+  })
+
+  server.dependency("storage", function(server, done) {
+    var Store = server.plugins.storage.store
+    Store.createContainer("restaurants").then(function() {
+      done()
+    }).catch(done)
+
+    Pictures.hook("afterDestroy", function(pic) {
+      return Store.removeFile("restaurants", pic.filename)
+    })
   })
 }
