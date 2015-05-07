@@ -69,5 +69,5 @@ function joiChoose(d) {
 }
 
 module.exports = function joiToSwagger(j) {
-  return joiChoose((_.isObject(j) && j.isJoi === true) ? j.describe() : Joi.object(j).describe())
+  return joiChoose((_.isObject(j) && j.isJoi === true) ? j.describe() : j)
 }
