@@ -1,3 +1,4 @@
+"use strict"
 var P = require("bluebird"),
   bcrypt = require("bcrypt"),
   hashAsync = P.promisify(bcrypt.hash),

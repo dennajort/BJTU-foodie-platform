@@ -1,3 +1,4 @@
+"use strict"
 function IStorage() {}
 
 IStorage.prototype.makeUrl = function(name, file) {

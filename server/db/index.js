@@ -1,3 +1,4 @@
+"use strict"
 var Sequelize = require("sequelize"),
   Umzug = require("umzug"),
   Boom = require("boom"),
@@ -9,11 +10,11 @@ exports.register = function(server, options, next) {
   server.ext("onPostHandler", function(req, rep) {
     var res = req.response
     if (res instanceof Sequelize.ValidationError) {
-      var b = Boom.badRequest("Database validation error")
+      let b = Boom.badRequest("Database validation error")
       b.output.payload.validation = {"keys": res.fields}
       return rep(b)
     } else if (res.statusCode == 200) {
-      var instanceArray = Joi.array().items(Joi.object().type(Sequelize.Instance).required())
+      let instanceArray = Joi.array().items(Joi.object().type(Sequelize.Instance).required())
       if (res.source === undefined) {
       } else if (res.source instanceof Sequelize.Instance) {
         return rep(req.response.source.toJSON())

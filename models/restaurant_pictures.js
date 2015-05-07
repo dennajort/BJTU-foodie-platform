@@ -1,3 +1,4 @@
+"use strict"
 var Joi = require("joi"),
   P = require("bluebird"),
   Sequelize = require("sequelize"),

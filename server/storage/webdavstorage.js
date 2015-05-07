@@ -1,3 +1,4 @@
+"use strict"
 var IStorage = require("./interface"),
   inherits = require("util").inherits,
   request = require("request"),

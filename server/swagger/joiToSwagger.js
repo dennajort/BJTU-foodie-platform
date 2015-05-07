@@ -1,3 +1,4 @@
+"use strict"
 var _ = require("lodash"),
   Joi = require("joi")
 
@@ -21,9 +22,9 @@ function joiString(d) {
 
 function joiNumber(d) {
   var rules = _.isArray(d.rules) ? d.rules : [],
-      isInteger = _.some(rules, function(rule) {
-        return Boolean(rule.name == "integer")
-      })
+    isInteger = _.some(rules, function(rule) {
+      return Boolean(rule.name == "integer")
+    })
   return addCommon(d, {type: isInteger ? "integer" : "number"})
 }
 

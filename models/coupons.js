@@ -1,3 +1,4 @@
+"use strict"
 var Joi = require("joi"),
   FlakeID = require("flake-idgen"),
   fid = new FlakeID(),

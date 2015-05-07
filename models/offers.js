@@ -1,3 +1,4 @@
+"use strict"
 var Joi = require("joi"),
   Sequelize = require("sequelize"),
   STRING = Sequelize.STRING,

@@ -1,6 +1,7 @@
+"use strict"
 var _ = require("lodash"),
-    path = require("path"),
-    joiToSwagger = require("./joiToSwagger")
+  path = require("path"),
+  joiToSwagger = require("./joiToSwagger")
 
 function makeResponse(route) {
   var res = route.settings.response,
@@ -25,7 +26,7 @@ function makeResponse(route) {
 
 function makeParameters(route) {
   var params = [],
-      valid = route.settings.validate
+    valid = route.settings.validate
 
   function shortener(j, where, required) {
     if (!_.isObject(j)) return

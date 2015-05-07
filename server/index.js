@@ -1,3 +1,4 @@
+"use strict"
 var P = require("bluebird"),
   Hapi = require("hapi"),
   Boom = require("boom")

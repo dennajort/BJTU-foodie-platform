@@ -1,3 +1,4 @@
+"use strict"
 var Joi = require("joi"),
   _ = require("lodash"),
   geo = require("geolib")

@@ -1,3 +1,4 @@
+"use strict"
 var Joi = require("joi"),
   Boom = require("boom"),
   _ = require("lodash")
