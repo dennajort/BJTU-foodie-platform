@@ -7,7 +7,7 @@ RUN PACKAGES="build-base python git ca-certificates curl" \
 && rm -rf /var/cache/apk/*
 
 # Install io.js
-RUN IOJS_VERSION="v1.8.1" \
+RUN IOJS_VERSION="v2.0.0" \
 && set -x \
 && curl https://iojs.org/dist/$IOJS_VERSION/iojs-$IOJS_VERSION.tar.xz | tar xJ \
 && cd iojs-$IOJS_VERSION && ./configure && make && make install \
