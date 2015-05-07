@@ -6,14 +6,14 @@ var Joi = require("joi"),
   jwt = require("jsonwebtoken"),
   jwtVerifyAsync = P.promisify(jwt.verify, jwt)
 
-var APP_SECRET = "secret",
+const APP_SECRET = "secret",
   EXP_TIME = 60 * 60 * 24 * 2,
   EXP_TIME_REFRESH = 60 * 60 * 24 * 15
 
 exports.register = function(server, options, next) {
   var Users = server.plugins.db.users
 
-  var validateFunc = function(token, callback) {
+  function validateFunc(token, callback) {
     jwtVerifyAsync(token, APP_SECRET).then(function(data) {
       return Users.findOne(data.userId).then(function(user) {
         if (user === null) return callback(null, false)
