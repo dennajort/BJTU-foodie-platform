@@ -2,6 +2,7 @@ if (require.main === module) {
   if (process.env.NODE_ENV === undefined) {
     process.env.NODE_ENV = "development"
   }
+
   var loader = require("./server"),
       _ = require("lodash")
 
