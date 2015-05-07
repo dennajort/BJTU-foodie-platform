@@ -10,7 +10,7 @@ RUN PACKAGES="build-base python git ca-certificates curl" \
 RUN IOJS_VERSION="v2.0.0" \
 && set -x \
 && curl https://iojs.org/dist/$IOJS_VERSION/iojs-$IOJS_VERSION.tar.xz | tar xJ \
-&& cd iojs-$IOJS_VERSION && ./configure && make && make install \
+&& cd iojs-$IOJS_VERSION && ./configure && make -j 4 && make install \
 && cd .. && rm -rf iojs-$IOJS_VERSION
 
 # Install Foodie-platform
