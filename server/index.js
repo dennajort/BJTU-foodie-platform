@@ -27,6 +27,7 @@ module.exports = function loadServer() {
       },
       require("./rest"),
       require("./db"),
+      require("./idgen"),
       require("./handlers"),
       require("./oauth"),
       require("./storage")

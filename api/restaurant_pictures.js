@@ -1,10 +1,7 @@
 "use strict"
 var Joi = require("joi"),
   _ = require("lodash"),
-  Boom = require("boom"),
-  FlakeID = require("flake-idgen"),
-  fid = new FlakeID(),
-  intformat = require('biguint-format')
+  Boom = require("boom")
 
 module.exports = function(server) {
   var Rest = server.plugins.rest,
@@ -81,7 +78,8 @@ module.exports = function(server) {
                 if (pics.length > 0) return pics[0].destroy()
               })
             }).then(function() {
-              var filename = intformat(fid.next(), 'hex')
+              var idgen = server.plugins.idgen
+              var filename = idgen.format(idgen.next(), 'hex')
               var ext = req.payload.file.hapi.filename.split(".").slice(1).join(".")
               filename = `${filename}.${ext}`
               return Store.upload("restaurants", filename, req.payload.file).then(function() {
@@ -120,7 +118,8 @@ module.exports = function(server) {
             return resto.isOwner(req.auth.credentials.user.id).then(function(ok) {
               if (!ok) throw Boom.unauthorized()
             }).then(function() {
-              var filename = intformat(fid.next(), 'hex')
+              var idgen = server.plugins.idgen
+              var filename = idgen.format(idgen.next(), 'hex')
               var ext = req.payload.file.hapi.filename.split(".").slice(1).join(".")
               filename = `${filename}.${ext}`
               return Store.upload("restaurants", filename, req.payload.file).then(function() {

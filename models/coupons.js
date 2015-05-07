@@ -1,8 +1,5 @@
 "use strict"
 var Joi = require("joi"),
-  FlakeID = require("flake-idgen"),
-  fid = new FlakeID(),
-  intformat = require('biguint-format'),
   P = require("bluebird"),
   Sequelize = require("sequelize"),
   STRING = Sequelize.STRING,
@@ -29,7 +26,8 @@ module.exports = function(db, server) {
       unique: true,
       allowNull: false,
       defaultValue: function() {
-        return intformat(fid.next(), 'hex', { prefix: '0x' })
+        var idgen = server.plugins.idgen
+        return idgen.format(idgen.next(), 'hex', { prefix: '0x' })
       }
     },
     used: {
