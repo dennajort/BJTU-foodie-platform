@@ -1,10 +1,12 @@
 var _ = require("lodash")
 
 exports.doAssociations = function(db) {
-  var Users = db.models.users,
-    Restaurants = db.models.restaurants,
-    Offers = db.models.offers,
-    Coupons = db.models.coupons
+  var m = db.models,
+    Users = m.users,
+    Restaurants = m.restaurants,
+    Offers = m.offers,
+    Coupons = m.coupons,
+    RestaurantPictures = m.restaurant_pictures
 
   // Users - Restaurants 1:m
   Users.hasMany(Restaurants, {
@@ -51,6 +53,18 @@ exports.doAssociations = function(db) {
   Coupons.belongsTo(Users, {
     as: "Owner",
     foreignKey: "owner",
+    onDelete: "SET NULL"
+  })
+
+  // Restaurants - RestaurantPictures 1:m
+  Restaurants.hasMany(RestaurantPictures, {
+    as: "Pictures",
+    foreignKey: "restaurant",
+    onDelete: "CASCADE"
+  })
+  RestaurantPictures.belongsTo(Restaurants, {
+    as: "Restaurant",
+    foreignKey: "restaurant",
     onDelete: "SET NULL"
   })
 }
