@@ -57,15 +57,20 @@ WebDavStorage.prototype.createContainer = function(name) {
   var self = this
   return new P(function(resolve, reject) {
     self._req({
-      method: "MKCOL",
+      method: "HEAD",
       uri: "/" + name
     }, function(err, res) {
-      if (err) return reject(err)
-      switch (res.statusCode) {
-        case 201: case 200: return resolve(false)
-        case 405: return resolve(true)
-        default: return reject()
-      }
+      if (res.statusCode == 200) return resolve(true)
+      self._req({
+        method: "MKCOL",
+        uri: "/" + name
+      }, function(err, res) {
+        if (err) return reject(err)
+        switch (res.statusCode) {
+          case 201: case 200: return resolve(false)
+          default: return reject()
+        }
+      })
     })
   })
 }
