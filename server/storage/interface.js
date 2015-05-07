@@ -1,5 +1,9 @@
 function IStorage() {}
 
+IStorage.prototype.makeUrl = function(name, file) {
+  return `/storage/${name}/${file}`
+}
+
 IStorage.prototype.getContainers = function() {
   throw new Error("Not implemented")
 }

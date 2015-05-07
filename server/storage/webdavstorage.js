@@ -5,7 +5,8 @@ var IStorage = require("./interface"),
   DOMParser = require("xmldom").DOMParser,
   _ = require("lodash"),
   url = require("url"),
-  Boom = require("boom")
+  Boom = require("boom"),
+  PassThrough = require("stream").PassThrough
 
 function WebDavStorage(opts) {
   this._req = request.defaults({
@@ -105,15 +106,16 @@ WebDavStorage.prototype.download = function(name, file, rep) {
 WebDavStorage.prototype.downloadStream = function(name, file) {
   var self = this
   return new P(function(resolve, reject) {
-    var stream = self._req({
+    var dup = new PassThrough()
+    self._req({
       method: "GET",
       uri: "/" + name + "/" + file
     }).on("response", function(res) {
-      if (res.statusCode == 200) return resolve(stream)
+      if (res.statusCode == 200) return resolve(dup)
       reject(res.statusCode)
     }).on("error", function(err) {
       return reject(err)
-    })
+    }).pipe(dup)
   })
 }
 
