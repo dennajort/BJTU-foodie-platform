@@ -4,6 +4,20 @@ module.exports = function(server) {
   var Rest = server.plugins.rest,
     Users = server.plugins.db.users
 
+  server.route({
+    path: "/me",
+    method: "GET",
+    config: {
+      auth: "oauth",
+      description: "Get current authenticated user",
+      tags: ["me"],
+      response: {schema: Users.toJoi()},
+      handler: function(req, rep) {
+        rep(req.auth.credentials.user)
+      }
+    }
+  })
+
   // User getters
   server.route([
     Rest.findAll({
