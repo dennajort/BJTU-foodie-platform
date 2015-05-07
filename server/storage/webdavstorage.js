@@ -4,7 +4,6 @@ var IStorage = require("./interface"),
   P = require("bluebird"),
   DOMParser = require("xmldom").DOMParser,
   _ = require("lodash"),
-  pd = require("pretty-data").pd,
   url = require("url"),
   Boom = require("boom")
 
