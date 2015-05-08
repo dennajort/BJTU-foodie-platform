@@ -5,6 +5,8 @@ var Joi = require("joi"),
   INTEGER = Sequelize.INTEGER,
   BOOLEAN = Sequelize.BOOLEAN
 
+const CONTAINER_NAME = "restaurants"
+
 module.exports = function(db, server) {
   var Pictures = db.define("restaurant_pictures", {
     id: {
@@ -37,7 +39,7 @@ module.exports = function(db, server) {
       toJSON: function() {
         var store = server.plugins.storage.store
         var pic = Sequelize.Instance.prototype.toJSON.call(this)
-        pic.url = store.makeUrl("restaurants", this.filename)
+        pic.url = store.makeUrl(CONTAINER_NAME, this.filename)
         return pic
       }
     },
@@ -71,12 +73,12 @@ module.exports = function(db, server) {
   server.dependency("storage", function(server, done) {
     var Store = server.plugins.storage.store
 
-    Store.createContainer("restaurants").then(function() {
+    Pictures.hook("afterDestroy", function(pic) {
+      return Store.removeFile(CONTAINER_NAME, pic.filename)
+    })
+
+    Store.createContainer(CONTAINER_NAME).then(function() {
       done()
     }).catch(done)
-
-    Pictures.hook("afterDestroy", function(pic) {
-      return Store.removeFile("restaurants", pic.filename)
-    })
   })
 }
