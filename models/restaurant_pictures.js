@@ -70,6 +70,7 @@ module.exports = function(db, server) {
 
   server.dependency("storage", function(server, done) {
     var Store = server.plugins.storage.store
+
     Store.createContainer("restaurants").then(function() {
       done()
     }).catch(done)
