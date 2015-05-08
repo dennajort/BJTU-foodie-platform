@@ -17,8 +17,7 @@ exports.doAssociations = function(db) {
   })
   Restaurants.belongsTo(Users, {
     as: "Owner",
-    foreignKey: "owner",
-    onDelete: "SET NULL"
+    foreignKey: "owner"
   })
 
   // Restaurants - Offers 1:m
@@ -29,8 +28,7 @@ exports.doAssociations = function(db) {
   })
   Offers.belongsTo(Restaurants, {
     as: "Restaurant",
-    foreignKey: "restaurant",
-    onDelete: "SET NULL"
+    foreignKey: "restaurant"
   })
 
   // Offers - Coupons 1:m
@@ -41,8 +39,7 @@ exports.doAssociations = function(db) {
   })
   Coupons.belongsTo(Offers, {
     as: "Offer",
-    foreignKey: "offer",
-    onDelete: "SET NULL"
+    foreignKey: "offer"
   })
 
   // Users - Coupons 1:m
@@ -53,8 +50,7 @@ exports.doAssociations = function(db) {
   })
   Coupons.belongsTo(Users, {
     as: "Owner",
-    foreignKey: "owner",
-    onDelete: "SET NULL"
+    foreignKey: "owner"
   })
 
   // Restaurants - RestaurantPictures 1:m
@@ -66,8 +62,7 @@ exports.doAssociations = function(db) {
   })
   RestaurantPictures.belongsTo(Restaurants, {
     as: "Restaurant",
-    foreignKey: "restaurant",
-    onDelete: "SET NULL"
+    foreignKey: "restaurant"
   })
 }
 
