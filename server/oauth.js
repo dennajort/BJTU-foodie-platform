@@ -89,7 +89,7 @@ exports.register = function(server, options, next) {
         })(req.payload.scope)
 
         if (req.payload.grant_type == "password") {
-          Users.findOne({email: req.payload.username}).then(function(user) {
+          Users.findOne({where: {email: req.payload.username}}).then(function(user) {
             if (user === null) return doError("invalid_grant")
             return user.checkPassword(req.payload.password).then(function(ok) {
               if (ok) return generateTokens(user.id, scope)
