@@ -46,7 +46,15 @@ module.exports = function(server) {
           }).catch(rep)
         }
       }
-    }
+    },
+    Rest.findAll({
+      model: Pictures,
+      path: "/restaurant_pictures"
+    }),
+    Rest.findOne({
+      model: Pictures,
+      path: "/restaurant_pictures/{id}"
+    })
   ])
 
   // Pictures setters
