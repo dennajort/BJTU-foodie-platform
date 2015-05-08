@@ -1,6 +1,5 @@
 "use strict"
-var _ = require("lodash"),
-  FlakeID = require("flake-idgen")
+var FlakeID = require("flake-idgen")
 
 exports.register = function (server, options, next) {
   var fid = new FlakeID({

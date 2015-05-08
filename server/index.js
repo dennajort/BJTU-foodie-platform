@@ -1,7 +1,6 @@
 "use strict"
 var P = require("bluebird"),
-  Hapi = require("hapi"),
-  Boom = require("boom")
+  Hapi = require("hapi")
 
 module.exports = function loadServer() {
   var server = new Hapi.Server({

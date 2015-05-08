@@ -4,10 +4,9 @@ var Joi = require("joi"),
   STRING = Sequelize.STRING,
   INTEGER = Sequelize.INTEGER,
   TEXT = Sequelize.TEXT,
-  FLOAT = Sequelize.FLOAT,
   DATE = Sequelize.DATE
 
-module.exports = function(db, server) {
+module.exports = function(db) {
   db.define("offers", {
     id: {
       type: INTEGER,

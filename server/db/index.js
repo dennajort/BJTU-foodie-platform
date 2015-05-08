@@ -38,7 +38,7 @@ exports.register = function(server, options, next) {
     }
   })
 
-  umzug.up().then(function(migrations) {
+  umzug.up().then(function() {
     var models = require("../../models")
     _.forEach(models.models, function(f) {
       f(sequelize, server)

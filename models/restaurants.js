@@ -7,7 +7,7 @@ var Joi = require("joi"),
   TEXT = Sequelize.TEXT,
   FLOAT = Sequelize.FLOAT
 
-module.exports = function(db, server) {
+module.exports = function(db) {
   db.define("restaurants", {
     id: {
       type: INTEGER,

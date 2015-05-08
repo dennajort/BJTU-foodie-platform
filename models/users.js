@@ -8,7 +8,7 @@ var P = require("bluebird"),
   STRING = Sequelize.STRING,
   INTEGER = Sequelize.INTEGER
 
-module.exports = function(db, server) {
+module.exports = function(db) {
   db.define("users", {
     id: {
       type: INTEGER,

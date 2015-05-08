@@ -14,7 +14,7 @@ module.exports = {
     })
   },
 
-  down: function(migration, DataTypes) {
+  down: function(migration) {
     return migration.removeColumn('restaurants', "phone").then(function() {
       return migration.removeColumn("restaurants", "email")
     })

@@ -4,8 +4,7 @@ if (require.main === module) {
     process.env.NODE_ENV = "development"
   }
 
-  let loader = require("./server"),
-    _ = require("lodash")
+  let loader = require("./server")
 
   loader().then(function(server) {
     server.start(function () {

@@ -1,9 +1,10 @@
 "use strict"
 module.exports = {
-  up: function(migration, DataTypes) {
+  up: function(migration) {
     return migration.dropAllTables()
   },
 
-  down: function(migration, DataTypes) {
+  down: function() {
+    return Promise.resolve()
   }
 }

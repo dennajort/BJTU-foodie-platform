@@ -24,7 +24,7 @@ exports.register = function(server, options, next) {
       }).catch(function(e) {
         callback(e)
       })
-    }).catch(function(e) {
+    }).catch(function() {
       callback(null, false)
     })
   }
@@ -102,7 +102,7 @@ exports.register = function(server, options, next) {
               return generateTokens(data.userId, scope)
             }
             doError("invalid_scope")
-          }).catch(jwt.TokenExpiredError, function(err) {
+          }).catch(jwt.TokenExpiredError, function() {
             doError("invalid_grant")
           })
         } else {

@@ -160,7 +160,7 @@ exports.register = function(server, options, done) {
                 })
                 return entry
               }).then(function(entry) {
-                return m.destroy().then(function() {
+                return entry.destroy().then(function() {
                   rep().code(204).type('application/json')
                 })
               }).catch(rep)

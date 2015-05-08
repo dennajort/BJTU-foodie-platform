@@ -1,6 +1,5 @@
 "use strict"
-var Joi = require("joi"),
-  _ = require("lodash"),
+var _ = require("lodash"),
   P = require("bluebird")
 
 module.exports = function(server) {

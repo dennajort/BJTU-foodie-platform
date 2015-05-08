@@ -1,6 +1,5 @@
 "use strict"
-var _ = require("lodash"),
-  Joi = require("joi")
+var _ = require("lodash")
 
 function addCommon(d, v) {
   if (d.flags && d.flags.default) {
@@ -56,7 +55,7 @@ function joiDate(d) {
   return addCommon(d, v)
 }
 
-function joiAlternatives(d) {
+function joiAlternatives() {
   return joiString({})
 }
 

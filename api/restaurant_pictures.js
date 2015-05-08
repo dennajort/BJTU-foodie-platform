@@ -1,6 +1,5 @@
 "use strict"
 var Joi = require("joi"),
-  _ = require("lodash"),
   Boom = require("boom")
 
 module.exports = function(server) {

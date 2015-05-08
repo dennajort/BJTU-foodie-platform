@@ -27,7 +27,7 @@ module.exports = {
     })
   },
 
-  down: function(migration, DataTypes) {
+  down: function(migration) {
     return migration.dropTable('users')
   }
 }

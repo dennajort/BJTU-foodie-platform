@@ -1,6 +1,4 @@
 "use strict"
-var Joi = require("joi")
-
 module.exports = function(server) {
   var Rest = server.plugins.rest,
     Users = server.plugins.db.users
