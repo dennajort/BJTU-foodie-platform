@@ -1,7 +1,8 @@
 "use strict"
 module.exports = function(server) {
   var Rest = server.plugins.rest,
-    Users = server.plugins.db.users
+    Users = server.plugins.db.users,
+    Store = server.plugins.storage.store
 
   server.route({
     path: "/me",
@@ -29,18 +30,38 @@ module.exports = function(server) {
     })
   ])
 
-  // User setters
+  // Users setters
   server.route([
-    Rest.create({
-      model: Users,
+    {
       path: "/users",
-      payload: Users.joiAttributes(),
-      preCreate: function(payload) {
-        return Users.hashPassword(payload.password).then(function(enc_password) {
-          payload.password = enc_password
-          return payload
-        })
+      method: "POST",
+      config: {
+        description: "Create a user",
+        tags: [Users.name],
+        response: {schema: Users.toJoi()},
+        validate: {payload: Users.joiAttributes()},
+        payload: {output: "stream", parse: true},
+        handler: function(req, rep) {
+          Users.hashPassword(req.payload.password).then(function(enc_password) {
+            req.payload.password = enc_password
+            var picture = req.payload.picture
+            var idgen = server.plugins.idgen
+            var filename = idgen.format(idgen.next(), 'hex')
+            var ext = picture.hapi.filename.split(".").slice(1).join(".")
+            filename = `${filename}.${ext}`
+            req.payload.picture = filename
+            return Store.upload("users", filename, picture).then(function() {
+              return Users.create(req.payload).then(function(user) {
+                rep(user)
+              }).catch(function(err) {
+                return Store.removeFile("users", filename).then(function() {
+                  throw err
+                })
+              })
+            })
+          }).catch(rep)
+        }
       }
-    })
+    }
   ])
 }

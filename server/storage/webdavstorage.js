@@ -61,6 +61,7 @@ WebDavStorage.prototype.createContainer = function(name) {
       method: "HEAD",
       uri: "/" + name
     }, function(err, res) {
+      if (err) return reject(err)
       if (res.statusCode == 200) return resolve(true)
       self._req({
         method: "MKCOL",

@@ -125,6 +125,7 @@ exports.register = function(server, options, done) {
             tags: tags,
             response: {schema: m.toJoi()},
             validate: {payload: o.payload},
+            payload: o.payloadAttr,
             auth: o.auth || false,
             handler: function(req, rep) {
               var payload = req.payload
@@ -183,6 +184,7 @@ exports.register = function(server, options, done) {
               payload: o.payload
             },
             response: {schema: m.toJoi()},
+            payload: o.payloadAttr,
             auth: o.auth || false,
             handler: function(req, rep) {
               m.findOne(req.params.id).then(function(entry) {
