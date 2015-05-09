@@ -40,7 +40,7 @@ module.exports = function(server) {
         tags: [Users.name],
         response: {schema: Users.toJoi()},
         validate: {payload: Users.joiAttributes()},
-        payload: {output: "stream", parse: true},
+        payload: {output: "stream", parse: true, maxBytes: 10485760},
         handler: function(req, rep) {
           Users.hashPassword(req.payload.password).then(function(enc_password) {
             req.payload.password = enc_password

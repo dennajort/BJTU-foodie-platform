@@ -67,7 +67,7 @@ module.exports = function(server) {
         tags: [Restaurants.name, Pictures.name, "me"],
         auth: "oauth",
         response: {schema: Pictures.toJoi()},
-        payload: {output: "stream", parse: true},
+        payload: {output: "stream", parse: true, maxBytes: 10485760},
         validate: {
           params: {id: Joi.number().integer().required()},
           payload: {
@@ -110,7 +110,7 @@ module.exports = function(server) {
         tags: [Restaurants.name, Pictures.name, "me"],
         auth: "oauth",
         response: {schema: Pictures.toJoi()},
-        payload: {output: "stream", parse: true},
+        payload: {output: "stream", parse: true, maxBytes: 10485760},
         validate: {
           params: {id: Joi.number().integer().required()},
           payload: {
