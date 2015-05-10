@@ -80,6 +80,7 @@ module.exports = function(server) {
         validate: {query: {secret: Joi.string().required()}},
         handler: function(req, rep) {
           getInfoCoupon(req.query.secret, req.auth.credentials.user.id).then(function(infos) {
+            if (infos.valid === false) return rep({valid: false, offer: infos.offer})
             return infos.offer.getRestaurant().then(function(resto) {
               if (resto === null) return rep({valid: false})
               rep({valid: infos.valid, offer: infos.offer.toJSON(), restaurant: resto.toJSON()})
