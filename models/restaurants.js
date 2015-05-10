@@ -93,7 +93,7 @@ module.exports = function(db) {
           id: Joi.number().integer(),
           name: Joi.string(),
           short_description: Joi.string(),
-          long_description: Joi.string(),
+          long_description: Joi.string().allow(""),
           email: Joi.string(),
           phone: Joi.string(),
           address: Joi.string(),
