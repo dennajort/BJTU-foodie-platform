@@ -99,6 +99,7 @@ module.exports = function(server) {
         handler: function(req, rep) {
           getInfoCoupon(req.payload.secret, req.auth.credentials.user.id).then(function(infos) {
             if (!infos.valid) return rep({ok: false})
+            return rep({ok: true})
             return infos.coupon.update({used: true}).then(function() {
               rep({ok: true})
             })
