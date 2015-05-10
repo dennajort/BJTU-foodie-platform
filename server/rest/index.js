@@ -225,7 +225,7 @@ exports.register = function(server, options, done) {
               var payload = req.payload
               pm.findOne(req.params.id).then(function(mypm) {
                 if (mypm === null) throw Boom.notFound()
-                if (o.asOwner) return pm.isOwner(getOwnerFromAuth(req)).then(function(ok) {
+                if (o.asOwner) return mypm.isOwner(getOwnerFromAuth(req)).then(function(ok) {
                   if (ok) return mypm
                   throw Boom.unauthorized()
                 })
