@@ -1,20 +1,21 @@
 "use strict"
-var WebDavStorage = require("./webdavstorage"),
-  Joi = require("joi")
+var Joi = require("joi"),
+  path = require("path")
 
 exports.register = function(server, options, next) {
-  var url = "http://owncloud.dennajort.fr/remote.php/webdav/"
-  if (process.env.NODE_ENV == "production") {
-    url += "prod/"
-  } else {
-    url += "dev/"
-  }
-
-  var Storage = new WebDavStorage({
-    username: "foodie",
-    password: "foodie",
-    url: url
-  })
+  var Storage = (function(env) {
+    if (env == "production") {
+      return new (require("./webdavstorage"))({
+        username: "foodie",
+        password: "foodie",
+        url: "http://owncloud.dennajort.fr/remote.php/webdav/prod/"
+      })
+    } else {
+      return new (require("./localstorage"))({
+        path: path.join(__dirname, "..", "..", "run", "uploads")
+      })
+    }
+  })(process.env.NODE_ENV)
 
   server.expose("store", Storage)
 

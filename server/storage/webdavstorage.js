@@ -6,7 +6,6 @@ var IStorage = require("./interface"),
   DOMParser = require("xmldom").DOMParser,
   _ = require("lodash"),
   url = require("url"),
-  Boom = require("boom"),
   PassThrough = require("stream").PassThrough
 
 function WebDavStorage(opts) {
@@ -64,7 +63,7 @@ WebDavStorage.prototype.createContainer = P.method(function(name) {
 })
 
 WebDavStorage.prototype._metaRemove = P.method(function(uri) {
-  return this._reqAsync({method: "DELETE", uri: uri}).spread(function(err, res) {
+  return this._reqAsync({method: "DELETE", uri: uri}).spread(function(res) {
     switch (res.statusCode) {
       case 204: case 404: return
       default: return P.reject()
@@ -80,15 +79,6 @@ WebDavStorage.prototype.removeFile = P.method(function(name, file) {
   return this._metaRemove(`/${name}/${file}`)
 })
 
-WebDavStorage.prototype.download = P.method(function(name, file, rep) {
-  return this.downloadStream(name, file).then(function(stream) {
-    rep(stream)
-  }).catch(function(err) {
-    if (err == 404) throw Boom.notFound()
-    throw err
-  })
-})
-
 WebDavStorage.prototype.downloadStream = P.method(function(name, file) {
   return new P(function(resolve, reject) {
     var dup = new PassThrough()
@@ -97,21 +87,12 @@ WebDavStorage.prototype.downloadStream = P.method(function(name, file) {
       uri: `/${name}/${file}`
     }).on("response", function(res) {
       if (res.statusCode == 200) return resolve(dup)
+      if (res.statusCode == 404) return reject(new IStorage.NotFound())
       reject(res.statusCode)
     }).on("error", function(err) {
       return reject(err)
     }).pipe(dup)
   }.bind(this))
-})
-
-WebDavStorage.prototype.upload = P.method(function(name, file, stream) {
-  return this.uploadStream(name, file).then(function(out) {
-    return new P(function(resolve, reject) {
-      stream.pipe(out)
-      out.on("finish", function() {resolve()})
-      out.on("error", function() {reject()})
-    })
-  })
 })
 
 WebDavStorage.prototype.uploadStream = P.method(function(name, file) {

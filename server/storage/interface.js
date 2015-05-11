@@ -1,6 +1,19 @@
 "use strict"
 // jshint unused:false
+var P = require("bluebird"),
+  Boom = require("boom"),
+  inherits = require("util").inherits
+
+function NotFound() {
+  Error.call(this)
+  this.name = "NotFound"
+}
+
+inherits(NotFound, Error)
+
 function IStorage() {}
+
+IStorage.NotFound = NotFound
 
 IStorage.prototype.makeUrl = function(name, file) {
   return `/storage/${name}/${file}`
@@ -35,7 +48,11 @@ IStorage.prototype.removeFile = function(name, file) {
 }
 
 IStorage.prototype.download = function(name, file, rep) {
-  throw new Error("Not implemented")
+  return this.downloadStream(name, file).then(function(stream) {
+    rep(stream)
+  }).catch(NotFound, function() {
+    throw Boom.notFound()
+  })
 }
 
 IStorage.prototype.downloadStream = function(name, file) {
@@ -43,7 +60,13 @@ IStorage.prototype.downloadStream = function(name, file) {
 }
 
 IStorage.prototype.upload = function(name, file, stream) {
-  throw new Error("Not implemented")
+  return this.uploadStream(name, file).then(function(out) {
+    return new P(function(resolve, reject) {
+      stream.pipe(out)
+      out.on("finish", function() {resolve()})
+      out.on("error", function(err) {reject(err)})
+    })
+  })
 }
 
 IStorage.prototype.uploadStream = function(name, file) {
