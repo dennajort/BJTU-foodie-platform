@@ -3,24 +3,21 @@ var Sequelize = require("sequelize"),
   Umzug = require("umzug"),
   Boom = require("boom"),
   _ = require("lodash"),
-  path = require("path"),
-  Joi = require("joi")
+  path = require("path")
 
 exports.register = function(server, options, next) {
+  function toJSON(v) {return (_.isFunction(v.toJSON)) ? v.toJSON() : v}
+
   server.ext("onPostHandler", function(req, rep) {
-    var res = req.response
+    var res = req.response, source = res.source
     if (res instanceof Sequelize.ValidationError) {
       let b = Boom.badRequest("Database validation error")
       b.output.payload.validation = {"keys": res.fields}
       return rep(b)
-    } else if (res.statusCode == 200) {
-      let instanceArray = Joi.array().items(Joi.object().type(Sequelize.Instance).required())
-      if (res.source === undefined) {
-      } else if (res.source instanceof Sequelize.Instance) {
-        return rep(req.response.source.toJSON())
-      } else if (instanceArray.validate(res.source).error === null) {
-        return rep(_.map(res.source, function(e) {return e.toJSON()}))
-      }
+    } else if (res.statusCode == 200 && source !== undefined && source !== null) {
+      if (_.isFunction(source.toJSON)) return rep(source.toJSON())
+      if (_.isArray(source)) return rep(_.map(source, toJSON))
+      if (_.isPlainObject(source)) return rep(_.mapValues(source, toJSON))
     }
     rep.continue()
   })

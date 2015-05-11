@@ -83,7 +83,7 @@ module.exports = function(server) {
             if (infos.valid === false) return rep({valid: false, offer: infos.offer})
             return infos.offer.getRestaurant().then(function(resto) {
               if (resto === null) return rep({valid: false})
-              rep({valid: infos.valid, offer: infos.offer.toJSON(), restaurant: resto.toJSON()})
+              rep({valid: infos.valid, offer: infos.offer, restaurant: resto})
             })
           }).catch(rep)
         }
