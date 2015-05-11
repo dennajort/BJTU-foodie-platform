@@ -6,7 +6,9 @@ var Sequelize = require("sequelize"),
   path = require("path")
 
 exports.register = function(server, options, next) {
-  function toJSON(v) {return (_.isFunction(v.toJSON)) ? v.toJSON() : v}
+  function toJSON(v) {
+    return (v === undefined) ? v : ((_.isFunction(v.toJSON)) ? v.toJSON() : v)
+  }
 
   server.ext("onPostHandler", function(req, rep) {
     var res = req.response, source = res.source
