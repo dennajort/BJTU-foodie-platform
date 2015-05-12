@@ -88,6 +88,9 @@ module.exports = function(db, server) {
       }
     },
     instanceMethods: {
+      isOwner: function(oid) {
+        return P.resolve(oid == this.id)
+      },
       toJSON: function() {
         var Store = server.plugins.storage.store
         var user = Sequelize.Instance.prototype.toJSON.call(this)

@@ -25,10 +25,7 @@ module.exports = function(db, server) {
       type: STRING,
       unique: true,
       allowNull: false,
-      defaultValue: function() {
-        var idgen = server.plugins.idgen
-        return idgen.format(idgen.next(), 'hex', { prefix: '0x' })
-      }
+      defaultValue: function() {return server.plugins.idgen.rand()}
     },
     used: {
       type: BOOLEAN,

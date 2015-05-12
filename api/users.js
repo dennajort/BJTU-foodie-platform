@@ -45,10 +45,9 @@ module.exports = function(server) {
           Users.hashPassword(req.payload.password).then(function(enc_password) {
             req.payload.password = enc_password
             var picture = req.payload.picture
-            var idgen = server.plugins.idgen
-            var filename = idgen.format(idgen.next(), 'hex')
+            var rand = server.plugins.idgen.rand
             var ext = picture.hapi.filename.split(".").slice(1).join(".")
-            filename = `${filename}.${ext}`
+            var filename = `${rand()}.${ext}`
             req.payload.picture = filename
             return Store.upload("users", filename, picture).then(function() {
               return Users.create(req.payload).then(function(user) {

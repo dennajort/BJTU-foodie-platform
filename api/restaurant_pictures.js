@@ -85,10 +85,9 @@ module.exports = function(server) {
                 if (pics.length > 0) return pics[0].destroy()
               })
             }).then(function() {
-              var idgen = server.plugins.idgen
-              var filename = idgen.format(idgen.next(), 'hex')
+              var rand = server.plugins.idgen.rand
               var ext = req.payload.file.hapi.filename.split(".").slice(1).join(".")
-              filename = `${filename}.${ext}`
+              var filename = `${rand()}.${ext}`
               return Store.upload("restaurants", filename, req.payload.file).then(function() {
                 return resto.createPicture({
                   filename: filename,
@@ -125,10 +124,9 @@ module.exports = function(server) {
             return resto.isOwner(req.auth.credentials.user.id).then(function(ok) {
               if (!ok) throw Boom.unauthorized()
             }).then(function() {
-              var idgen = server.plugins.idgen
-              var filename = idgen.format(idgen.next(), 'hex')
+              var rand = server.plugins.idgen.rand
               var ext = req.payload.file.hapi.filename.split(".").slice(1).join(".")
-              filename = `${filename}.${ext}`
+              var filename = `${rand()}.${ext}`
               return Store.upload("restaurants", filename, req.payload.file).then(function() {
                 return resto.createPicture({
                   filename: filename,

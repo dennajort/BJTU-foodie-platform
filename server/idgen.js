@@ -1,15 +1,10 @@
 "use strict"
-var FlakeID = require("flake-idgen")
+var uuid = require('node-uuid')
 
-exports.register = function (server, options, next) {
-  var fid = new FlakeID({
-    worker: process.env.WORKER_ID || 0
+exports.register = function(server, options, next) {
+  server.expose("rand", function() {
+    return uuid.v4({rng: uuid.nodeRNG})
   })
-
-  server.expose("next", function(fn) {
-    return fid.next(fn)
-  })
-  server.expose("format", require('biguint-format'))
   next()
 }
 
