@@ -7,11 +7,12 @@ var Sequelize = require("sequelize"),
 
 exports.register = function(server, options, next) {
   function toJSON(v) {
-    return (v === undefined || !_.isFunction(v.toJSON)) ? v : v.toJSON()
+    return (v === undefined || v === null || !_.isFunction(v.toJSON)) ? v : v.toJSON()
   }
 
   server.ext("onPostHandler", function(req, rep) {
     var res = req.response, source = res.source
+    if (res.variety === "file") return rep.continue()
     if (res instanceof Sequelize.ValidationError) {
       let b = Boom.badRequest("Database validation error")
       b.output.payload.validation = {"keys": res.fields}
