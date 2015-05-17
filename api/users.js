@@ -45,17 +45,21 @@ module.exports = function(server) {
           Users.hashPassword(req.payload.password).then(function(enc_password) {
             req.payload.password = enc_password
             var picture = req.payload.picture
+            if (picture === undefined) return [req.payload, undefined]
             var rand = server.plugins.idgen.rand
             var ext = picture.hapi.filename.split(".").slice(1).join(".")
             var filename = `${rand()}.${ext}`
             req.payload.picture = filename
             return Store.upload("users", filename, picture).then(function() {
-              return Users.create(req.payload).then(function(user) {
-                rep(user)
-              }).catch(function(err) {
-                return Store.removeFile("users", filename).then(function() {
-                  throw err
-                })
+              return [req.payload, filename]
+            })
+          }).spread(function(payload, filename) {
+            return Users.create(payload).then(function(user) {
+              rep(user)
+            }).catch(function(err) {
+              if (filename === undefined) throw err
+              return Store.removeFile("users", filename).then(function() {
+                throw err
               })
             })
           }).catch(rep)
