@@ -77,7 +77,7 @@ module.exports = function(server) {
           }
         },
         handler: function(req, rep) {
-          Restaurants.findOne(req.params.id).then(function(resto) {
+          Restaurants.findById(req.params.id).then(function(resto) {
             if (resto === null) throw Boom.notFound()
             return resto.isOwner(req.auth.credentials.user.id).then(function(ok) {
               if (!ok) throw Boom.unauthorized()
@@ -119,7 +119,7 @@ module.exports = function(server) {
           }
         },
         handler: function(req, rep) {
-          Restaurants.findOne(req.params.id).then(function(resto) {
+          Restaurants.findById(req.params.id).then(function(resto) {
             if (resto === null) throw Boom.notFound()
             return resto.isOwner(req.auth.credentials.user.id).then(function(ok) {
               if (!ok) throw Boom.unauthorized()

@@ -15,7 +15,7 @@ exports.register = function(server, options, next) {
 
   function validateFunc(token, callback) {
     jwtVerifyAsync(token, APP_SECRET).then(function(data) {
-      return Users.findOne(data.userId).then(function(user) {
+      return Users.findById(data.userId).then(function(user) {
         if (user === null) return callback(null, false)
         callback(undefined, true, {
           user: user,

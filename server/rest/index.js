@@ -70,7 +70,7 @@ exports.register = function(server, options, done) {
             validate: {params: {id: Joi.number().integer().required()}},
             auth: o.auth || false,
             handler: function(req, rep) {
-              m.findOne(req.params.id).then(function(entry) {
+              m.findById(req.params.id).then(function(entry) {
                 if (entry === null) throw Boom.notFound()
                 rep(entry)
               }).catch(rep)
@@ -153,7 +153,7 @@ exports.register = function(server, options, done) {
             response: {status: {"204": Joi}},
             auth: o.auth || false,
             handler: function(req, rep) {
-              m.findOne(req.params.id).then(function(entry) {
+              m.findById(req.params.id).then(function(entry) {
                 if (entry === null) throw Boom.notFound()
                 if (o.asOwner) return entry.isOwner(getOwnerFromAuth(req)).then(function(ok) {
                   if (ok) return entry
@@ -187,7 +187,7 @@ exports.register = function(server, options, done) {
             payload: o.payloadAttr,
             auth: o.auth || false,
             handler: function(req, rep) {
-              m.findOne(req.params.id).then(function(entry) {
+              m.findById(req.params.id).then(function(entry) {
                 if (entry === null) throw Boom.notFound()
                 if (o.asOwner) return entry.isOwner(getOwnerFromAuth(req)).then(function(ok) {
                   if (ok) return entry
@@ -223,7 +223,7 @@ exports.register = function(server, options, done) {
             auth: o.auth || false,
             handler: function(req, rep) {
               var payload = req.payload
-              pm.findOne(req.params.id).then(function(mypm) {
+              pm.findById(req.params.id).then(function(mypm) {
                 if (mypm === null) throw Boom.notFound()
                 if (o.asOwner) return mypm.isOwner(getOwnerFromAuth(req)).then(function(ok) {
                   if (ok) return mypm

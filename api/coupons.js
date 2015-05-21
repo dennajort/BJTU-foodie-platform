@@ -31,7 +31,7 @@ module.exports = function(server) {
       response: {schema: Coupons.toJoi()},
       validate: {params: {id: Joi.number().integer().required()}},
       handler: function(req, rep) {
-        Offers.findOne(req.params.id).then(function(offer) {
+        Offers.findById(req.params.id).then(function(offer) {
           if (offer === null) throw Boom.notFound()
           if (offer.isExpired() || (offer.limit_coupon && offer.remaining <= 0)) throw Boom.badRequest()
           if (offer.limit_coupon) return offer.decrement("remaining").then(function(new_offer) {
