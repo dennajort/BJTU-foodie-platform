@@ -7,7 +7,8 @@ exports.doAssociations = function(db) {
     Restaurants = m.restaurants,
     Offers = m.offers,
     Coupons = m.coupons,
-    RestaurantPictures = m.restaurant_pictures
+    RestaurantPictures = m.restaurant_pictures,
+    GCMKeys = m.gcm_keys
 
   // Users - Restaurants 1:m
   Users.hasMany(Restaurants, {
@@ -63,6 +64,17 @@ exports.doAssociations = function(db) {
   RestaurantPictures.belongsTo(Restaurants, {
     as: "Restaurant",
     foreignKey: "restaurant",
+  })
+
+  // Users - GCMKeys 1:m
+  Users.hasMany(GCMKeys, {
+    as: "GCMKeys",
+    foreignKey: "owner",
+    onDelete: "cascade"
+  })
+  GCMKeys.belongsTo(Users, {
+    as: "Owner",
+    foreignKey: "owner"
   })
 }
 
