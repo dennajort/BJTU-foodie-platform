@@ -29,7 +29,8 @@ module.exports = function loadServer() {
       require("./idgen"),
       require("./handlers"),
       require("./oauth"),
-      require("./storage")
+      require("./storage"),
+      require("./gcm")
     ]),
     register(require("../api"), {routes: {prefix: "/api"}})
   ]
